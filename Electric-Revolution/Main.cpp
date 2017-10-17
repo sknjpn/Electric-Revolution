@@ -172,77 +172,29 @@ struct Machine
 
 	void	draw()
 	{
+		String path;
 		switch (type)
 		{
 		case 0:
-			assets->texture(L"machine1/machine1.png")->draw(region.pos);
-			switch (nodes[1].state)
-			{
-			case NodeState::Hi:
-				assets->texture(L"machine1/machine1-2-1.png")->draw(region.pos);
-				break;
-			case NodeState::Low:
-				assets->texture(L"machine1/machine1-2-2.png")->draw(region.pos);
-				break;
-			}
-			switch (nodes[0].state)
-			{
-			case NodeState::Hi:
-				assets->texture(L"machine1/machine1-1-1.png")->draw(region.pos);
-				break;
-			case NodeState::Low:
-				assets->texture(L"machine1/machine1-1-2.png")->draw(region.pos);
-				break;
-			}
+			path = L"machine1/";
+			assets->texture(L"machine1/image.png")->draw(region.pos);
 			break;
 		case 1:
-			assets->texture(L"machine2/machine2.png")->draw(region.pos);
-			switch (nodes[0].state)
-			{
-			case NodeState::Hi:
-				assets->texture(L"machine2/machine2-1.png")->draw(region.pos);
-				break;
-			case NodeState::Low:
-				assets->texture(L"machine2/machine2-2.png")->draw(region.pos);
-				break;
-			}
+			path = L"machine2/";
+			assets->texture(L"machine2/image.png")->draw(region.pos);
 			break;
 		case 2:
-			assets->texture(L"machine3/machine3.png")->draw(region.pos);
-			switch (nodes[0].state)
-			{
-			case NodeState::Hi:
-				assets->texture(L"machine3/machine3-1-1.png")->draw(region.pos);
-				break;
-			case NodeState::Low:
-				assets->texture(L"machine3/machine3-1-2.png")->draw(region.pos);
-				break;
-			}
-			switch (nodes[1].state)
-			{
-			case NodeState::Hi:
-				assets->texture(L"machine3/machine3-2-1.png")->draw(region.pos);
-				break;
-			case NodeState::Low:
-				assets->texture(L"machine3/machine3-2-2.png")->draw(region.pos);
-				break;
-			}
-			switch (nodes[2].state)
-			{
-			case NodeState::Hi:
-				assets->texture(L"machine3/machine3-3-1.png")->draw(region.pos);
-				break;
-			case NodeState::Low:
-				assets->texture(L"machine3/machine3-3-2.png")->draw(region.pos);
-				break;
-			}
+			path = L"machine3/";
+			assets->texture(L"machine3/image.png")->draw(region.pos);
 			break;
 		case 3:
-			assets->texture(L"machine4/machine4.png")->draw(region.pos);
+			path = L"machine4/";
+			assets->texture(L"machine4/image.png")->draw(region.pos);
 			break;
 		case 4:
 		{
-			assets->texture(L"machine5/machine5.png")->draw(region.pos);
+			path = L"machine5/";
+			assets->texture(L"machine5/image.png")->draw(region.pos);
 			int number = 0;
 			number += nodes[0].state == NodeState::Hi ? 1 : 0;
 			number += nodes[1].state == NodeState::Hi ? 2 : 0;
@@ -251,141 +203,138 @@ struct Machine
 			switch (number)
 			{
 			case 0:
-				assets->texture(L"machine5/machine5-1-1.png")->draw(region.pos);
-				assets->texture(L"machine5/machine5-1-2.png")->draw(region.pos);
-				assets->texture(L"machine5/machine5-1-3.png")->draw(region.pos);
-				assets->texture(L"machine5/machine5-1-4.png")->draw(region.pos);
-				assets->texture(L"machine5/machine5-1-5.png")->draw(region.pos);
-				assets->texture(L"machine5/machine5-1-6.png")->draw(region.pos);
+				assets->texture(L"machine5/led-a.png")->draw(region.pos);
+				assets->texture(L"machine5/led-b.png")->draw(region.pos);
+				assets->texture(L"machine5/led-c.png")->draw(region.pos);
+				assets->texture(L"machine5/led-d.png")->draw(region.pos);
+				assets->texture(L"machine5/led-e.png")->draw(region.pos);
+				assets->texture(L"machine5/led-f.png")->draw(region.pos);
 				break;
 			case 1:
-				assets->texture(L"machine5/machine5-1-2.png")->draw(region.pos);
-				assets->texture(L"machine5/machine5-1-3.png")->draw(region.pos);
+				assets->texture(L"machine5/led-b.png")->draw(region.pos);
+				assets->texture(L"machine5/led-c.png")->draw(region.pos);
 				break;
 			case 2:
-				assets->texture(L"machine5/machine5-1-1.png")->draw(region.pos);
-				assets->texture(L"machine5/machine5-1-2.png")->draw(region.pos);
-				assets->texture(L"machine5/machine5-1-4.png")->draw(region.pos);
-				assets->texture(L"machine5/machine5-1-5.png")->draw(region.pos);
-				assets->texture(L"machine5/machine5-1-7.png")->draw(region.pos);
+				assets->texture(L"machine5/led-a.png")->draw(region.pos);
+				assets->texture(L"machine5/led-b.png")->draw(region.pos);
+				assets->texture(L"machine5/led-d.png")->draw(region.pos);
+				assets->texture(L"machine5/led-e.png")->draw(region.pos);
+				assets->texture(L"machine5/led-g.png")->draw(region.pos);
 				break;
 			case 3:
-				assets->texture(L"machine5/machine5-1-1.png")->draw(region.pos);
-				assets->texture(L"machine5/machine5-1-2.png")->draw(region.pos);
-				assets->texture(L"machine5/machine5-1-3.png")->draw(region.pos);
-				assets->texture(L"machine5/machine5-1-4.png")->draw(region.pos);
-				assets->texture(L"machine5/machine5-1-7.png")->draw(region.pos);
+				assets->texture(L"machine5/led-a.png")->draw(region.pos);
+				assets->texture(L"machine5/led-b.png")->draw(region.pos);
+				assets->texture(L"machine5/led-c.png")->draw(region.pos);
+				assets->texture(L"machine5/led-d.png")->draw(region.pos);
+				assets->texture(L"machine5/led-g.png")->draw(region.pos);
 				break;
 			case 4:
-				assets->texture(L"machine5/machine5-1-2.png")->draw(region.pos);
-				assets->texture(L"machine5/machine5-1-3.png")->draw(region.pos);
-				assets->texture(L"machine5/machine5-1-6.png")->draw(region.pos);
-				assets->texture(L"machine5/machine5-1-7.png")->draw(region.pos);
+				assets->texture(L"machine5/led-b.png")->draw(region.pos);
+				assets->texture(L"machine5/led-c.png")->draw(region.pos);
+				assets->texture(L"machine5/led-f.png")->draw(region.pos);
+				assets->texture(L"machine5/led-g.png")->draw(region.pos);
 				break;
 			case 5:
-				assets->texture(L"machine5/machine5-1-1.png")->draw(region.pos);
-				assets->texture(L"machine5/machine5-1-3.png")->draw(region.pos);
-				assets->texture(L"machine5/machine5-1-4.png")->draw(region.pos);
-				assets->texture(L"machine5/machine5-1-6.png")->draw(region.pos);
-				assets->texture(L"machine5/machine5-1-7.png")->draw(region.pos);
+				assets->texture(L"machine5/led-a.png")->draw(region.pos);
+				assets->texture(L"machine5/led-c.png")->draw(region.pos);
+				assets->texture(L"machine5/led-d.png")->draw(region.pos);
+				assets->texture(L"machine5/led-f.png")->draw(region.pos);
+				assets->texture(L"machine5/led-g.png")->draw(region.pos);
 				break;
 			case 6:
-				assets->texture(L"machine5/machine5-1-1.png")->draw(region.pos);
-				assets->texture(L"machine5/machine5-1-3.png")->draw(region.pos);
-				assets->texture(L"machine5/machine5-1-4.png")->draw(region.pos);
-				assets->texture(L"machine5/machine5-1-5.png")->draw(region.pos);
-				assets->texture(L"machine5/machine5-1-6.png")->draw(region.pos);
-				assets->texture(L"machine5/machine5-1-7.png")->draw(region.pos);
+				assets->texture(L"machine5/led-a.png")->draw(region.pos);
+				assets->texture(L"machine5/led-c.png")->draw(region.pos);
+				assets->texture(L"machine5/led-d.png")->draw(region.pos);
+				assets->texture(L"machine5/led-e.png")->draw(region.pos);
+				assets->texture(L"machine5/led-f.png")->draw(region.pos);
+				assets->texture(L"machine5/led-g.png")->draw(region.pos);
 				break;
 			case 7:
-				assets->texture(L"machine5/machine5-1-1.png")->draw(region.pos);
-				assets->texture(L"machine5/machine5-1-2.png")->draw(region.pos);
-				assets->texture(L"machine5/machine5-1-3.png")->draw(region.pos);
-				assets->texture(L"machine5/machine5-1-6.png")->draw(region.pos);
+				assets->texture(L"machine5/led-a.png")->draw(region.pos);
+				assets->texture(L"machine5/led-b.png")->draw(region.pos);
+				assets->texture(L"machine5/led-c.png")->draw(region.pos);
+				assets->texture(L"machine5/led-f.png")->draw(region.pos);
 				break;
 			case 8:
-				assets->texture(L"machine5/machine5-1-1.png")->draw(region.pos);
-				assets->texture(L"machine5/machine5-1-2.png")->draw(region.pos);
-				assets->texture(L"machine5/machine5-1-3.png")->draw(region.pos);
-				assets->texture(L"machine5/machine5-1-4.png")->draw(region.pos);
-				assets->texture(L"machine5/machine5-1-5.png")->draw(region.pos);
-				assets->texture(L"machine5/machine5-1-6.png")->draw(region.pos);
-				assets->texture(L"machine5/machine5-1-7.png")->draw(region.pos);
+				assets->texture(L"machine5/led-a.png")->draw(region.pos);
+				assets->texture(L"machine5/led-b.png")->draw(region.pos);
+				assets->texture(L"machine5/led-c.png")->draw(region.pos);
+				assets->texture(L"machine5/led-d.png")->draw(region.pos);
+				assets->texture(L"machine5/led-e.png")->draw(region.pos);
+				assets->texture(L"machine5/led-f.png")->draw(region.pos);
+				assets->texture(L"machine5/led-g.png")->draw(region.pos);
 				break;
 			case 9:
-				assets->texture(L"machine5/machine5-1-1.png")->draw(region.pos);
-				assets->texture(L"machine5/machine5-1-2.png")->draw(region.pos);
-				assets->texture(L"machine5/machine5-1-3.png")->draw(region.pos);
-				assets->texture(L"machine5/machine5-1-4.png")->draw(region.pos);
-				assets->texture(L"machine5/machine5-1-6.png")->draw(region.pos);
-				assets->texture(L"machine5/machine5-1-7.png")->draw(region.pos);
+				assets->texture(L"machine5/led-a.png")->draw(region.pos);
+				assets->texture(L"machine5/led-b.png")->draw(region.pos);
+				assets->texture(L"machine5/led-c.png")->draw(region.pos);
+				assets->texture(L"machine5/led-d.png")->draw(region.pos);
+				assets->texture(L"machine5/led-f.png")->draw(region.pos);
+				assets->texture(L"machine5/led-g.png")->draw(region.pos);
 				break;
 			case 10:
-				assets->texture(L"machine5/machine5-1-1.png")->draw(region.pos);
-				assets->texture(L"machine5/machine5-1-2.png")->draw(region.pos);
-				assets->texture(L"machine5/machine5-1-3.png")->draw(region.pos);
-				assets->texture(L"machine5/machine5-1-5.png")->draw(region.pos);
-				assets->texture(L"machine5/machine5-1-6.png")->draw(region.pos);
-				assets->texture(L"machine5/machine5-1-7.png")->draw(region.pos);
+				assets->texture(L"machine5/led-a.png")->draw(region.pos);
+				assets->texture(L"machine5/led-b.png")->draw(region.pos);
+				assets->texture(L"machine5/led-c.png")->draw(region.pos);
+				assets->texture(L"machine5/led-e.png")->draw(region.pos);
+				assets->texture(L"machine5/led-f.png")->draw(region.pos);
+				assets->texture(L"machine5/led-g.png")->draw(region.pos);
 				break;
 			case 11:
-				assets->texture(L"machine5/machine5-1-3.png")->draw(region.pos);
-				assets->texture(L"machine5/machine5-1-4.png")->draw(region.pos);
-				assets->texture(L"machine5/machine5-1-5.png")->draw(region.pos);
-				assets->texture(L"machine5/machine5-1-6.png")->draw(region.pos);
-				assets->texture(L"machine5/machine5-1-7.png")->draw(region.pos);
+				assets->texture(L"machine5/led-c.png")->draw(region.pos);
+				assets->texture(L"machine5/led-d.png")->draw(region.pos);
+				assets->texture(L"machine5/led-e.png")->draw(region.pos);
+				assets->texture(L"machine5/led-f.png")->draw(region.pos);
+				assets->texture(L"machine5/led-g.png")->draw(region.pos);
 				break;
 			case 12:
-				assets->texture(L"machine5/machine5-1-4.png")->draw(region.pos);
-				assets->texture(L"machine5/machine5-1-5.png")->draw(region.pos);
-				assets->texture(L"machine5/machine5-1-7.png")->draw(region.pos);
+				assets->texture(L"machine5/led-d.png")->draw(region.pos);
+				assets->texture(L"machine5/led-e.png")->draw(region.pos);
+				assets->texture(L"machine5/led-g.png")->draw(region.pos);
 				break;
 			case 13:
-				assets->texture(L"machine5/machine5-1-2.png")->draw(region.pos);
-				assets->texture(L"machine5/machine5-1-3.png")->draw(region.pos);
-				assets->texture(L"machine5/machine5-1-4.png")->draw(region.pos);
-				assets->texture(L"machine5/machine5-1-5.png")->draw(region.pos);
-				assets->texture(L"machine5/machine5-1-7.png")->draw(region.pos);
+				assets->texture(L"machine5/led-b.png")->draw(region.pos);
+				assets->texture(L"machine5/led-c.png")->draw(region.pos);
+				assets->texture(L"machine5/led-d.png")->draw(region.pos);
+				assets->texture(L"machine5/led-e.png")->draw(region.pos);
+				assets->texture(L"machine5/led-g.png")->draw(region.pos);
 				break;
 			case 14:
-				assets->texture(L"machine5/machine5-1-1.png")->draw(region.pos);
-				assets->texture(L"machine5/machine5-1-4.png")->draw(region.pos);
-				assets->texture(L"machine5/machine5-1-5.png")->draw(region.pos);
-				assets->texture(L"machine5/machine5-1-6.png")->draw(region.pos);
-				assets->texture(L"machine5/machine5-1-7.png")->draw(region.pos);
+				assets->texture(L"machine5/led-a.png")->draw(region.pos);
+				assets->texture(L"machine5/led-d.png")->draw(region.pos);
+				assets->texture(L"machine5/led-e.png")->draw(region.pos);
+				assets->texture(L"machine5/led-f.png")->draw(region.pos);
+				assets->texture(L"machine5/led-g.png")->draw(region.pos);
 				break;
 			case 15:
-				assets->texture(L"machine5/machine5-1-1.png")->draw(region.pos);
-				assets->texture(L"machine5/machine5-1-5.png")->draw(region.pos);
-				assets->texture(L"machine5/machine5-1-6.png")->draw(region.pos);
-				assets->texture(L"machine5/machine5-1-7.png")->draw(region.pos);
+				assets->texture(L"machine5/led-a.png")->draw(region.pos);
+				assets->texture(L"machine5/led-e.png")->draw(region.pos);
+				assets->texture(L"machine5/led-f.png")->draw(region.pos);
+				assets->texture(L"machine5/led-g.png")->draw(region.pos);
 				break;
 			}
 		}
 		break;
 		case 5:
-			assets->texture(L"machine6/machine6.png")->draw(region.pos);
-			switch (nodes[0].state)
-			{
-			case NodeState::Hi:
-				assets->texture(L"machine6/machine6-1-1.png")->draw(region.pos);
-				break;
-			case NodeState::Low:
-				assets->texture(L"machine6/machine6-1-2.png")->draw(region.pos);
-				break;
-			}
-			switch (nodes[1].state)
-			{
-			case NodeState::Hi:
-				assets->texture(L"machine6/machine6-2-1.png")->draw(region.pos);
-				break;
-			case NodeState::Low:
-				assets->texture(L"machine6/machine6-2-2.png")->draw(region.pos);
-				break;
-			}
+			path = L"machine6/";
+			assets->texture(L"machine6/image.png")->draw(region.pos);
 			break;
 		default:
 			break;
+		}
+		for (int i = 0; i < int(nodes.size()); i++)
+		{
+			Texture* tex = nullptr;
+			switch (nodes[i].state)
+			{
+			case NodeState::Hi:
+				tex = assets->texture(path + L"node" + Format(i) + L"-hi.png");
+				break;
+			case NodeState::Low:
+				tex = assets->texture(path + L"node" + Format(i) + L"-low.png");
+				break;
+			}
+			if (tex != nullptr) tex->draw(region.pos);
 		}
 
 		for (auto& n : nodes) n.draw();
