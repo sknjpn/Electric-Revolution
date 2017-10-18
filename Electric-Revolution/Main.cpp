@@ -1,6 +1,33 @@
-﻿# include <Siv3D.hpp> // OpenSiv3D v0.1.7
+﻿// OpenSiv3D v0.1.7
+
+#include<Siv3D.hpp>
+#include"sol.hpp"
 
 struct Machine;
+
+struct Item
+{
+	Point	from;
+	Point	to;
+	double	t;
+	Texture	texture;
+
+	Item(const Point& _pos)
+		: from(_pos)
+		, to(_pos)
+		, t(0.0)
+		, texture(L"assets/items/cookie.png")
+	{}
+
+	Vec2	pos() const
+	{
+		return Vec2(from).lerp(Vec2(to), t);
+	}
+	void	draw()
+	{
+		texture.resize(1, 1).draw(pos());
+	}
+};
 
 struct Assets
 {
@@ -65,13 +92,13 @@ struct Node
 		case NodeState::Low: color = Palette::Blue;	break;
 		case NodeState::None: color = Palette::White;	break;
 		}
-		Circle(pos(), 4).draw(color).drawFrame(2, Palette::Black);
-		if (mouseOver()) Circle(pos(), 4).draw(Color(0, 128));
+		Circle(pos(), 0.25).draw(color).drawFrame(0.125, 0, Palette::Black);
+		if (mouseOver()) Circle(pos(), 0.25).draw(Color(0, 128));
 	}
 	Vec2	pos() const;
 	bool	mouseOver() const
 	{
-		return Circle(pos(), 4).mouseOver();
+		return Circle(pos(), 0.25).mouseOver();
 	}
 };
 Node*	Node::selectedNode = nullptr;
@@ -97,7 +124,7 @@ struct Wire
 		case NodeState::Low: color = Palette::Blue;	break;
 		case NodeState::None: color = Palette::White;	break;
 		}
-		line().draw(6, Palette::Black).draw(4, color);
+		line().draw(0.25, Palette::Black).draw(0.125, color);
 	}
 
 	bool	update()
@@ -119,257 +146,253 @@ struct Wire
 	}
 };
 
-struct Machine
+struct Blueprint
 {
-	int	type;
-	Rect	region;
-	Array<Node>	nodes;
+	Size	size;
+	String	name;
+	FilePath	mainFile;
+	Array<std::pair<FilePath, Texture>>	textureAssets;
+	Array<std::pair<FilePath, Audio>>	audioAssets;
 
-	static Rect	newRegion;
-	static Assets*	assets;
-	static Machine*	selectedMachine;
-
-	Machine(int _type, Rect _region)
-		: type(_type)
-		, region(_region)
+	Blueprint(const FilePath& _mainFile)
+		: mainFile(_mainFile)
 	{
-		switch (_type)
+		INIReader	ini(_mainFile + L"config.ini");
+		name = ini.get<String>(L"Base.name");
+		size = ini.get<Size>(L"Base.size");
+
+		auto dc = FileSystem::DirectoryContents(mainFile);
+		for (auto& c : dc)
 		{
-		case 0:
-			nodes.emplace_back(Vec2(0.0, 24.0), this);
-			nodes.emplace_back(Vec2(64.0, 24.0), this);
-			break;
-		case 1:
-			nodes.emplace_back(Vec2(32.0, 0.0), this);
-			nodes.emplace_back(Vec2(32.0, 48.0), this);
-			nodes.emplace_back(Vec2(0.0, 24.0), this);
-			nodes.emplace_back(Vec2(64.0, 24.0), this);
-			break;
-		case 2:
-			nodes.emplace_back(Vec2(0.0, 24.0), this);
-			nodes.emplace_back(Vec2(32.0, 48.0), this);
-			nodes.emplace_back(Vec2(64.0, 24.0), this);
-			break;
-		case 3:
-			nodes.emplace_back(Vec2(0.0, 24.0), this, NodeState::Hi, true);
-			nodes.emplace_back(Vec2(64.0, 24.0), this, NodeState::Low, true);
-			break;
-		case 4:
-			nodes.emplace_back(Vec2(17.0, 48.0), this);
-			nodes.emplace_back(Vec2(27.0, 48.0), this);
-			nodes.emplace_back(Vec2(37.0, 48.0), this);
-			nodes.emplace_back(Vec2(47.0, 48.0), this);
-			break;
-		case 5:
-			nodes.emplace_back(Vec2(0.0, 24.0), this);
-			nodes.emplace_back(Vec2(64.0, 24.0), this);
-			nodes.emplace_back(Vec2(32.0, 24.0), this, NodeState::Low, true);
-			break;
-		default:
-			break;
+			if (FileSystem::IsFile(c))
+			{
+				auto ex = FileSystem::Extension(c);
+				if (ex == L"png")
+				{
+					textureAssets.emplace_back(c.removed(mainFile), Texture(c));
+				}
+				if (ex == L"mp3" || ex == L"wav")
+				{
+					audioAssets.emplace_back(c.removed(mainFile), Audio(c));
+				}
+			}
 		}
 	}
+};
 
+struct Machine
+{
+	sol::state	lua;
+	Blueprint*	blueprint;
+	Array<Node>	nodes;
+	Array<Audio>	audios;
+
+	static RectF	newRegion;
+	static Assets*	assets;
+	static Machine*	selectedMachine;
+	static Array<Item> items;
+	static Array<Blueprint>	blueprints;
+
+	Machine(int _type, Point _pos)
+		: blueprint(&blueprints[_type])
+	{
+		lua.script_file(CharacterSet::Narrow(blueprint->mainFile + L"main.lua").c_str());
+
+		lua.open_libraries(sol::lib::base, sol::lib::package);
+		lua["Print"] = [](const char* str) {
+			Print << CharacterSet::Widen(str);
+		};
+
+		lua["drawTexture"] = [this](const char* str, int posX = 0, int posY = 0, int sizeX = 0, int sizeY = 0)
+		{
+			for (auto& ta : blueprint->textureAssets)
+			{
+				if (ta.first == CharacterSet::Widen(str))
+				{
+					if (sizeX != 0 && sizeY != 0) ta.second.resize(sizeX, sizeY).draw(pos().movedBy(posX, posY));
+					else ta.second.resize(blueprint->size).draw(pos().movedBy(posX, posY));
+					return;
+				}
+			}
+		};
+		lua["setNode"] = [this](double x, double y, int state, bool fixed)
+		{
+			nodes.emplace_back(Vec2(x, y), this, NodeState(state), fixed);
+		};
+		lua["getNodeState"] = [this](int nodeID)
+		{
+			return int(nodes[nodeID].state);
+		};
+		lua["setNodeState"] = [this](int nodeID, int state)
+		{
+			nodes[nodeID].state = NodeState(state);
+		};
+		lua["machineLeftClicked"] = [this]()
+		{
+			return region().leftClicked();
+		};
+		lua["machineRightClicked"] = [this]()
+		{
+			return region().leftClicked();
+		};
+		lua["playAudio"] = [this](const char* str)
+		{
+			audios.emplace_back(blueprint->mainFile + CharacterSet::Widen(str));
+			audios.back().play();
+		};
+		lua["addItem"] = [this](int x, int y)
+		{
+			items.emplace_back(pos() + Point(x, y));
+		};
+		lua["moveItem"] = [this](int fromX, int fromY, int toX, int toY, double t)
+		{
+			for (auto& i : items)
+			{
+				if (i.from == Point(fromX, fromY).movedBy(pos()))
+				{
+					auto to = Point(toX, toY).movedBy(pos());
+					if (to != i.to)
+					{
+						bool flag = true;
+						for (auto& it : items)
+						{
+							if (it.from == to || it.to == to)
+							{
+								flag = false;
+								break;
+							}
+						}
+						if (!flag) continue;
+						i.to = to;
+					}
+					i.t += t;
+					if (i.t >= 1.0)
+					{
+						i.from = i.to;
+						i.t = 0.0;
+					}
+				}
+			}
+		};
+		lua["isItemPos"] = [this](int x, int y)
+		{
+			for (auto& i : items)
+			{
+				if (i.from == Point(x, y).movedBy(pos()) || i.to == Point(x, y).movedBy(pos())) return true;
+			}
+			return false;
+		};
+		lua["machinePosX"] = _pos.x;
+		lua["machinePosY"] = _pos.y;
+		lua["machineSizeX"] = blueprint->size.x;
+		lua["machineSizeY"] = blueprint->size.y;
+		lua["init"]();
+
+	}
 	void	draw()
 	{
-		String path;
-		switch (type)
-		{
-		case 0:
-			path = L"machine1/";
-			assets->texture(L"machine1/image.png")->draw(region.pos);
-			break;
-		case 1:
-			path = L"machine2/";
-			assets->texture(L"machine2/image.png")->draw(region.pos);
-			break;
-		case 2:
-			path = L"machine3/";
-			assets->texture(L"machine3/image.png")->draw(region.pos);
-			break;
-		case 3:
-			path = L"machine4/";
-			assets->texture(L"machine4/image.png")->draw(region.pos);
-			break;
-		case 4:
-		{
-			int number = 0;
-			int result = 0;
-
-			path = L"machine5/";
-			assets->texture(L"machine5/image.png")->draw(region.pos);
-			for (int i = 0; i < 4; i++) number += nodes[i].state == NodeState::Hi ? (1 << i) : 0;
-			switch (number)
-			{
-			case 0x0:	result = 0b00111111;	break;
-			case 0x1:	result = 0b00000110;	break;
-			case 0x2:	result = 0b01011011;	break;
-			case 0x3:	result = 0b01001111;	break;
-			case 0x4:	result = 0b01100110;	break;
-			case 0x5:	result = 0b01101101;	break;
-			case 0x6:	result = 0b01111101;	break;
-			case 0x7:	result = 0b00100111;	break;
-			case 0x8:	result = 0b01111111;	break;
-			case 0x9:	result = 0b01101111;	break;
-			case 0xA:	result = 0b01110111;	break;
-			case 0xB:	result = 0b01111100;	break;
-			case 0xC:	result = 0b01011000;	break;
-			case 0xD:	result = 0b01011110;	break;
-			case 0xE:	result = 0b01111001;	break;
-			case 0xF:	result = 0b01110001;	break;
-			}
-			if (result & (1 << 0)) assets->texture(L"machine5/led-a.png")->draw(region.pos);
-			if (result & (1 << 1)) assets->texture(L"machine5/led-b.png")->draw(region.pos);
-			if (result & (1 << 2)) assets->texture(L"machine5/led-c.png")->draw(region.pos);
-			if (result & (1 << 3)) assets->texture(L"machine5/led-d.png")->draw(region.pos);
-			if (result & (1 << 4)) assets->texture(L"machine5/led-e.png")->draw(region.pos);
-			if (result & (1 << 5)) assets->texture(L"machine5/led-f.png")->draw(region.pos);
-			if (result & (1 << 6)) assets->texture(L"machine5/led-g.png")->draw(region.pos);
-		}
-		break;
-		case 5:
-			path = L"machine6/";
-			assets->texture(L"machine6/image.png")->draw(region.pos);
-			break;
-		default:
-			break;
-		}
-		for (int i = 0; i < int(nodes.size()); i++)
-		{
-			Texture* tex = nullptr;
-			switch (nodes[i].state)
-			{
-			case NodeState::Hi:
-				tex = assets->texture(path + L"node" + Format(i) + L"-hi.png");
-				break;
-			case NodeState::Low:
-				tex = assets->texture(path + L"node" + Format(i) + L"-low.png");
-				break;
-			}
-			if (tex != nullptr) tex->draw(region.pos);
-		}
+		lua["draw"]();
 
 		for (auto& n : nodes) n.draw();
 
-		if (selectedMachine == this) region.draw(Color(Palette::Orange, 128));
+		if (selectedMachine == this) region().draw(Color(Palette::Orange, 128));
 	}
 
 	void	updateSystem()
 	{
-		switch (type)
-		{
-		case 5:
-			if (region.leftClicked())
-			{
-				if (nodes[2].state == NodeState::Hi) nodes[2].state = NodeState::Low;
-				else nodes[2].state = NodeState::Hi;
-			}
-			break;
-		}
+		lua["updateSystem"]();
 	}
 	bool	updateConnects()
 	{
-		bool flag = false;
-		switch (type)
-		{
-		case 0:
-			if (nodes[0].state == NodeState::Hi)
-			{
-				if (nodes[1].state != nodes[0].state) flag = true;
-				nodes[1].state = nodes[0].state;
-			}
-			break;
-		case 1:
-			if (nodes[0].state != NodeState::None)
-			{
-				if (nodes[1].state != nodes[0].state) flag = true;
-				if (nodes[2].state != nodes[0].state) flag = true;
-				if (nodes[3].state != nodes[0].state) flag = true;
-				nodes[1].state = nodes[0].state;
-				nodes[2].state = nodes[0].state;
-				nodes[3].state = nodes[0].state;
-			}
-			if (nodes[1].state != NodeState::None)
-			{
-				if (nodes[0].state != nodes[1].state) flag = true;
-				if (nodes[2].state != nodes[1].state) flag = true;
-				if (nodes[3].state != nodes[1].state) flag = true;
-				nodes[0].state = nodes[1].state;
-				nodes[2].state = nodes[1].state;
-				nodes[3].state = nodes[1].state;
-			}
-			if (nodes[2].state != NodeState::None)
-			{
-				if (nodes[0].state != nodes[2].state) flag = true;
-				if (nodes[1].state != nodes[2].state) flag = true;
-				if (nodes[3].state != nodes[2].state) flag = true;
-				nodes[0].state = nodes[2].state;
-				nodes[1].state = nodes[2].state;
-				nodes[3].state = nodes[2].state;
-			}
-			if (nodes[3].state != NodeState::None)
-			{
-				if (nodes[0].state != nodes[3].state) flag = true;
-				if (nodes[1].state != nodes[3].state) flag = true;
-				if (nodes[2].state != nodes[3].state) flag = true;
-				nodes[0].state = nodes[3].state;
-				nodes[1].state = nodes[3].state;
-				nodes[2].state = nodes[3].state;
-			}
-			break;
-		case 2:
-			if (nodes[1].state == NodeState::Hi)
-			{
-				if (nodes[0].state != NodeState::None)
-				{
-					if (nodes[2].state != nodes[0].state) flag = true;
-					nodes[2].state = nodes[0].state;
-
-				}
-				if (nodes[2].state != NodeState::None)
-				{
-					if (nodes[0].state != nodes[2].state) flag = true;
-					nodes[0].state = nodes[2].state;
-				}
-			}
-			break;
-		case 5:
-			if (nodes[2].state == NodeState::Hi)
-			{
-				if (nodes[0].state != NodeState::None)
-				{
-					if (nodes[1].state != nodes[0].state) flag = true;
-					nodes[1].state = nodes[0].state;
-
-				}
-				if (nodes[1].state != NodeState::None)
-				{
-					if (nodes[0].state != nodes[1].state) flag = true;
-					nodes[0].state = nodes[1].state;
-				}
-			}
-			break;
-		}
-		return flag;
+		lua["updateConnects"]();
+		audios.remove_if([](Audio& a) { return !a.isPlaying(); });
+		return false;
+	}
+	Point	pos() const
+	{
+		return { lua["machinePosX"].get<int>(), lua["machinePosY"].get<int>() };
+	}
+	Rect	region() const
+	{
+		return Rect(pos(), blueprint->size);
+	}
+	void	setRegion(const RectF& _region)
+	{
+		lua["machinePosX"] = int(_region.pos.x);
+		lua["machinePosY"] = int(_region.pos.y);
+		lua["machineSizeX"] = int(_region.size.x);
+		lua["machineSizeY"] = int(_region.size.y);
 	}
 };
 
-Rect	Machine::newRegion;
+RectF	Machine::newRegion;
 Assets*	Machine::assets;
 Machine*	Machine::selectedMachine = nullptr;
+Array<Item> Machine::items;
+Array<Blueprint>	Machine::blueprints;
 
 Vec2	Node::pos() const
 {
-	return parentMachine->region.pos.movedBy(inMachinePos);
+	return parentMachine->pos().movedBy(inMachinePos);
 }
+
+class Camera
+{
+public:
+	RectF	restrictedRegion;
+	RectF	drawingRegion;
+	RectF	smoothDrawingRegion;
+
+	Camera()
+		: restrictedRegion(Vec2(-2048, -2048), 3 * Vec2(2048, 2048))
+		, drawingRegion(0, 0, 32, 32)
+		, smoothDrawingRegion(drawingRegion)
+	{}
+	void	update()
+	{
+		{
+			auto t = createTransformer2D();
+
+			double delta = Mouse::Wheel();
+			//if (drawingRegion.size.y >= 180_deg && delta > 0) delta = 0;
+			//if (drawingRegion.size.y <= 1.8_deg && delta < 0) delta = 0;
+			drawingRegion = drawingRegion.scaledAt(Cursor::PosF(), 1.0 + 0.1*delta);
+
+			/*
+			if (drawingRegion.size.y > 180_deg) drawingRegion = drawingRegion.scaledAt(drawingRegion.center(), (180_deg / drawingRegion.size.y));
+			if (drawingRegion.pos.y < -90_deg) drawingRegion.pos.y = -90_deg;
+			if (drawingRegion.pos.y + drawingRegion.size.y > 90_deg) drawingRegion.pos.y = 90_deg - drawingRegion.size.y;
+			if (smoothDrawingRegion.pos.x < -180_deg) { drawingRegion.pos.x += 360_deg; smoothDrawingRegion.pos.x += 360_deg; }
+			if (smoothDrawingRegion.pos.x > 180_deg) { drawingRegion.pos.x -= 360_deg; smoothDrawingRegion.pos.x -= 360_deg; }
+			*/
+			const double followingSpeed = 0.2;
+			smoothDrawingRegion.pos = smoothDrawingRegion.pos*(1.0 - followingSpeed) + drawingRegion.pos*followingSpeed;
+			smoothDrawingRegion.size = smoothDrawingRegion.size*(1.0 - followingSpeed) + drawingRegion.size*followingSpeed;
+		}
+
+		const double slidingSpeed = (drawingRegion.size.y / 180_deg)*0.05;
+		const bool useKeyViewControl = true;
+
+		if ((useKeyViewControl && KeyA.pressed()) || Cursor::Pos().x <= 0) drawingRegion.pos.x -= slidingSpeed;
+		if ((useKeyViewControl && KeyW.pressed()) || Cursor::Pos().y <= 0) drawingRegion.pos.y -= slidingSpeed;
+		if ((useKeyViewControl && KeyD.pressed()) || Cursor::Pos().x >= Window::Size().x - 1) drawingRegion.pos.x += slidingSpeed;
+		if ((useKeyViewControl && KeyS.pressed()) || Cursor::Pos().y >= Window::Size().y - 1) drawingRegion.pos.y += slidingSpeed;
+	}
+	Transformer2D	createTransformer2D(double _magnification = 1.0) const
+	{
+		auto mat3x2 = Mat3x2::Scale(_magnification).translated(-smoothDrawingRegion.center()).scaled(Window::Size().y / smoothDrawingRegion.size.y).translated(Window::ClientRect().center());
+
+		return Transformer2D(mat3x2, true);
+	}
+};
 
 struct Game
 {
-	Point	rightClickedPoint;
+	Vec2	rightClickedPoint;
 	Assets	assets;
+	Camera	camera;
 	Array<Wire>	wires;
 	Array<Machine>	machines;
-
 
 	Game()
 	{
@@ -379,25 +402,34 @@ struct Game
 
 		Machine::assets = &assets;
 
+		for (auto c : FileSystem::DirectoryContents(L"assets/machines/"))
+		{
+			if (c.includes(L"config.ini")) Machine::blueprints.emplace_back(c.removed(L"config.ini"));
+		}
+
 		machines.reserve(1024);
 
-		for (int i = 0; i < 6; i++)
+		for (int i = 0; i < int(Machine::blueprints.size()); i++)
 		{
-			for (int j = 0; j < 10; j++)
+			for (int j = 0; j < 32; j++)
 			{
-				machines.emplace_back(i, Rect(80 * j, 64 * i, 64, 48));
+				machines.emplace_back(i, Point(5 * j, 4 * i));
 			}
 		}
+
 	}
 
 	void	update()
 	{
-		if (MouseR.down()) rightClickedPoint = Cursor::Pos();
+		camera.update();
+		auto t = camera.createTransformer2D();
+
+		if (MouseR.down()) rightClickedPoint = Cursor::PosF();
 		if (MouseR.up())
 		{
 			for (auto& w : wires)
 			{
-				if (w.line().intersects(Line(rightClickedPoint, Cursor::Pos())))
+				if (w.line().intersects(Line(rightClickedPoint, Cursor::PosF())))
 				{
 					w.broken = true;
 				}
@@ -411,9 +443,9 @@ struct Game
 			{
 				for (auto& m : machines)
 				{
-					if (m.region.leftClicked())
+					if (m.region().leftClicked())
 					{
-						Machine::newRegion = m.region;
+						Machine::newRegion = RectF(m.region()).movedBy(0.5, 0.5);
 						Machine::selectedMachine = &m;
 					}
 				}
@@ -430,10 +462,10 @@ struct Game
 				bool flag = false;
 				for (auto& m : machines)
 				{
-					if (&m != Machine::selectedMachine && m.region.intersects(Machine::newRegion)) flag = true;
+					if (&m != Machine::selectedMachine && m.region().intersects(Rect(Machine::newRegion))) flag = true;
 				}
 
-				if (!flag) Machine::selectedMachine->region = Machine::newRegion;
+				if (!flag) Machine::selectedMachine->setRegion(Machine::newRegion);
 
 				Machine::selectedMachine = nullptr;
 			}
@@ -450,9 +482,8 @@ struct Game
 		}
 		if (Machine::selectedMachine != nullptr)
 		{
-			Machine::newRegion.moveBy(Cursor::Delta());
+			Machine::newRegion.moveBy(Cursor::DeltaF());
 		}
-
 
 		for (auto& m : machines)
 		{
@@ -482,19 +513,20 @@ struct Game
 		{
 			for (auto& m : machines)
 			{
-				if (m.region.mouseOver()) m.region.draw(Color(Palette::Green, 128));
+				if (m.region().mouseOver()) m.region().draw(Color(Palette::Green, 128));
 			}
 		}
+		for (auto& i : Machine::items) i.draw();
 		if (Machine::selectedMachine != nullptr)
 		{
 			bool flag = false;
 			for (auto& m : machines)
 			{
-				if (&m != Machine::selectedMachine && m.region.intersects(Machine::newRegion)) flag = true;
+				if (&m != Machine::selectedMachine && m.region().intersects(Rect(Machine::newRegion))) flag = true;
 			}
 
-			if (flag) Machine::newRegion.draw(Color(Palette::Red, 128)).drawFrame(2, 0, Palette::Red);
-			else Machine::newRegion.draw(Color(Palette::Orange, 128)).drawFrame(2, 0, Palette::Orange);
+			if (flag) Rect(Machine::newRegion).draw(Color(Palette::Red, 128)).drawFrame(0.1, 0, Palette::Red);
+			else Rect(Machine::newRegion).draw(Color(Palette::Orange, 128)).drawFrame(0.1, 0, Palette::Orange);
 		}
 		for (auto& w : wires) w.draw();
 		if (Node::selectedNode != nullptr)
@@ -506,12 +538,12 @@ struct Game
 			case NodeState::Low: color = Palette::Blue;	break;
 			case NodeState::None: color = Palette::White;	break;
 			}
-			Line(Node::selectedNode->pos(), Cursor::Pos()).draw(6, Palette::Black).draw(4, color);
+			Line(Node::selectedNode->pos(), Cursor::PosF()).draw(0.25, Palette::Black).draw(0.125, color);
 		}
 
 		if (MouseR.pressed())
 		{
-			Line(rightClickedPoint, Cursor::Pos()).draw(3, Palette::Red);
+			Line(rightClickedPoint, Cursor::PosF()).draw(0.125, Palette::Red);
 		}
 	}
 

@@ -191,6 +191,7 @@
     <None Include="dll_x86\d3d\d3dcompiler_47.dll">
       <Filter>Resource Files\dll_x86\d3d</Filter>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Media Include="example\test.mp3">
