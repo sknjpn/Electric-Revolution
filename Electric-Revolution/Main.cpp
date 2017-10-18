@@ -193,126 +193,38 @@ struct Machine
 			break;
 		case 4:
 		{
+			int number = 0;
+			int result = 0;
+
 			path = L"machine5/";
 			assets->texture(L"machine5/image.png")->draw(region.pos);
-			int number = 0;
-			number += nodes[0].state == NodeState::Hi ? 1 : 0;
-			number += nodes[1].state == NodeState::Hi ? 2 : 0;
-			number += nodes[2].state == NodeState::Hi ? 4 : 0;
-			number += nodes[3].state == NodeState::Hi ? 8 : 0;
+			for (int i = 0; i < 4; i++) number += nodes[i].state == NodeState::Hi ? (1 << i) : 0;
 			switch (number)
 			{
-			case 0:
-				assets->texture(L"machine5/led-a.png")->draw(region.pos);
-				assets->texture(L"machine5/led-b.png")->draw(region.pos);
-				assets->texture(L"machine5/led-c.png")->draw(region.pos);
-				assets->texture(L"machine5/led-d.png")->draw(region.pos);
-				assets->texture(L"machine5/led-e.png")->draw(region.pos);
-				assets->texture(L"machine5/led-f.png")->draw(region.pos);
-				break;
-			case 1:
-				assets->texture(L"machine5/led-b.png")->draw(region.pos);
-				assets->texture(L"machine5/led-c.png")->draw(region.pos);
-				break;
-			case 2:
-				assets->texture(L"machine5/led-a.png")->draw(region.pos);
-				assets->texture(L"machine5/led-b.png")->draw(region.pos);
-				assets->texture(L"machine5/led-d.png")->draw(region.pos);
-				assets->texture(L"machine5/led-e.png")->draw(region.pos);
-				assets->texture(L"machine5/led-g.png")->draw(region.pos);
-				break;
-			case 3:
-				assets->texture(L"machine5/led-a.png")->draw(region.pos);
-				assets->texture(L"machine5/led-b.png")->draw(region.pos);
-				assets->texture(L"machine5/led-c.png")->draw(region.pos);
-				assets->texture(L"machine5/led-d.png")->draw(region.pos);
-				assets->texture(L"machine5/led-g.png")->draw(region.pos);
-				break;
-			case 4:
-				assets->texture(L"machine5/led-b.png")->draw(region.pos);
-				assets->texture(L"machine5/led-c.png")->draw(region.pos);
-				assets->texture(L"machine5/led-f.png")->draw(region.pos);
-				assets->texture(L"machine5/led-g.png")->draw(region.pos);
-				break;
-			case 5:
-				assets->texture(L"machine5/led-a.png")->draw(region.pos);
-				assets->texture(L"machine5/led-c.png")->draw(region.pos);
-				assets->texture(L"machine5/led-d.png")->draw(region.pos);
-				assets->texture(L"machine5/led-f.png")->draw(region.pos);
-				assets->texture(L"machine5/led-g.png")->draw(region.pos);
-				break;
-			case 6:
-				assets->texture(L"machine5/led-a.png")->draw(region.pos);
-				assets->texture(L"machine5/led-c.png")->draw(region.pos);
-				assets->texture(L"machine5/led-d.png")->draw(region.pos);
-				assets->texture(L"machine5/led-e.png")->draw(region.pos);
-				assets->texture(L"machine5/led-f.png")->draw(region.pos);
-				assets->texture(L"machine5/led-g.png")->draw(region.pos);
-				break;
-			case 7:
-				assets->texture(L"machine5/led-a.png")->draw(region.pos);
-				assets->texture(L"machine5/led-b.png")->draw(region.pos);
-				assets->texture(L"machine5/led-c.png")->draw(region.pos);
-				assets->texture(L"machine5/led-f.png")->draw(region.pos);
-				break;
-			case 8:
-				assets->texture(L"machine5/led-a.png")->draw(region.pos);
-				assets->texture(L"machine5/led-b.png")->draw(region.pos);
-				assets->texture(L"machine5/led-c.png")->draw(region.pos);
-				assets->texture(L"machine5/led-d.png")->draw(region.pos);
-				assets->texture(L"machine5/led-e.png")->draw(region.pos);
-				assets->texture(L"machine5/led-f.png")->draw(region.pos);
-				assets->texture(L"machine5/led-g.png")->draw(region.pos);
-				break;
-			case 9:
-				assets->texture(L"machine5/led-a.png")->draw(region.pos);
-				assets->texture(L"machine5/led-b.png")->draw(region.pos);
-				assets->texture(L"machine5/led-c.png")->draw(region.pos);
-				assets->texture(L"machine5/led-d.png")->draw(region.pos);
-				assets->texture(L"machine5/led-f.png")->draw(region.pos);
-				assets->texture(L"machine5/led-g.png")->draw(region.pos);
-				break;
-			case 10:
-				assets->texture(L"machine5/led-a.png")->draw(region.pos);
-				assets->texture(L"machine5/led-b.png")->draw(region.pos);
-				assets->texture(L"machine5/led-c.png")->draw(region.pos);
-				assets->texture(L"machine5/led-e.png")->draw(region.pos);
-				assets->texture(L"machine5/led-f.png")->draw(region.pos);
-				assets->texture(L"machine5/led-g.png")->draw(region.pos);
-				break;
-			case 11:
-				assets->texture(L"machine5/led-c.png")->draw(region.pos);
-				assets->texture(L"machine5/led-d.png")->draw(region.pos);
-				assets->texture(L"machine5/led-e.png")->draw(region.pos);
-				assets->texture(L"machine5/led-f.png")->draw(region.pos);
-				assets->texture(L"machine5/led-g.png")->draw(region.pos);
-				break;
-			case 12:
-				assets->texture(L"machine5/led-d.png")->draw(region.pos);
-				assets->texture(L"machine5/led-e.png")->draw(region.pos);
-				assets->texture(L"machine5/led-g.png")->draw(region.pos);
-				break;
-			case 13:
-				assets->texture(L"machine5/led-b.png")->draw(region.pos);
-				assets->texture(L"machine5/led-c.png")->draw(region.pos);
-				assets->texture(L"machine5/led-d.png")->draw(region.pos);
-				assets->texture(L"machine5/led-e.png")->draw(region.pos);
-				assets->texture(L"machine5/led-g.png")->draw(region.pos);
-				break;
-			case 14:
-				assets->texture(L"machine5/led-a.png")->draw(region.pos);
-				assets->texture(L"machine5/led-d.png")->draw(region.pos);
-				assets->texture(L"machine5/led-e.png")->draw(region.pos);
-				assets->texture(L"machine5/led-f.png")->draw(region.pos);
-				assets->texture(L"machine5/led-g.png")->draw(region.pos);
-				break;
-			case 15:
-				assets->texture(L"machine5/led-a.png")->draw(region.pos);
-				assets->texture(L"machine5/led-e.png")->draw(region.pos);
-				assets->texture(L"machine5/led-f.png")->draw(region.pos);
-				assets->texture(L"machine5/led-g.png")->draw(region.pos);
-				break;
+			case 0x0:	result = 0b00111111;	break;
+			case 0x1:	result = 0b00000110;	break;
+			case 0x2:	result = 0b01011011;	break;
+			case 0x3:	result = 0b01001111;	break;
+			case 0x4:	result = 0b01100110;	break;
+			case 0x5:	result = 0b01101101;	break;
+			case 0x6:	result = 0b01111101;	break;
+			case 0x7:	result = 0b00100111;	break;
+			case 0x8:	result = 0b01111111;	break;
+			case 0x9:	result = 0b01101111;	break;
+			case 0xA:	result = 0b01110111;	break;
+			case 0xB:	result = 0b01111100;	break;
+			case 0xC:	result = 0b01011000;	break;
+			case 0xD:	result = 0b01011110;	break;
+			case 0xE:	result = 0b01111001;	break;
+			case 0xF:	result = 0b01110001;	break;
 			}
+			if (result & (1 << 0)) assets->texture(L"machine5/led-a.png")->draw(region.pos);
+			if (result & (1 << 1)) assets->texture(L"machine5/led-b.png")->draw(region.pos);
+			if (result & (1 << 2)) assets->texture(L"machine5/led-c.png")->draw(region.pos);
+			if (result & (1 << 3)) assets->texture(L"machine5/led-d.png")->draw(region.pos);
+			if (result & (1 << 4)) assets->texture(L"machine5/led-e.png")->draw(region.pos);
+			if (result & (1 << 5)) assets->texture(L"machine5/led-f.png")->draw(region.pos);
+			if (result & (1 << 6)) assets->texture(L"machine5/led-g.png")->draw(region.pos);
 		}
 		break;
 		case 5:
