@@ -68,17 +68,19 @@ struct Node
 	int	numConnected;
 	bool	fixed;
 	Vec2	inMachinePos;
+	Vec2	dv;
 	NodeState	state;
 	Machine*	parentMachine;
 
 	static Node*	selectedNode;
 
-	Node(const Vec2& _pos, Machine* _parentMachine, NodeState _state = NodeState::None, bool _fixed = false)
+	Node(const Vec2& _pos, const Vec2& _dv, Machine* _parentMachine, NodeState _state, bool _fixed)
 		: inMachinePos(_pos)
 		, parentMachine(_parentMachine)
 		, state(_state)
 		, numConnected(0)
 		, fixed(_fixed)
+		, dv(_dv)
 	{
 
 	}
@@ -115,17 +117,7 @@ struct Wire
 		, broken(false)
 	{}
 
-	void	draw()
-	{
-		Color color = Color(0, 0);
-		switch (from->state)
-		{
-		case NodeState::Hi: color = Palette::Red;	break;
-		case NodeState::Low: color = Palette::Blue;	break;
-		case NodeState::None: color = Palette::White;	break;
-		}
-		line().draw(0.25, Palette::Black).draw(0.125, color);
-	}
+	void	draw();
 
 	bool	update()
 	{
@@ -140,10 +132,7 @@ struct Wire
 		else to->state = from->state;
 		return true;
 	}
-	Line	line() const
-	{
-		return Line(from->pos(), to->pos());
-	}
+	Bezier3	line() const;
 };
 
 struct Blueprint
@@ -178,6 +167,15 @@ struct Blueprint
 			}
 		}
 	}
+
+	Texture*	texture(const String& _name)
+	{
+		for (auto& ta : textureAssets)
+		{
+			if (ta.first == _name) return &ta.second;
+		}
+		return nullptr;
+	}
 };
 
 struct Machine
@@ -187,7 +185,8 @@ struct Machine
 	Array<Node>	nodes;
 	Array<Audio>	audios;
 
-	static RectF	newRegion;
+	static int	newMachineAngle;
+	static Rect	newMachineRegion;
 	static Assets*	assets;
 	static Machine*	selectedMachine;
 	static Array<Item> items;
@@ -203,21 +202,24 @@ struct Machine
 			Print << CharacterSet::Widen(str);
 		};
 
-		lua["drawTexture"] = [this](const char* str, int posX = 0, int posY = 0, int sizeX = 0, int sizeY = 0)
+		lua["drawTexture"] = [this](const char* str)
 		{
 			for (auto& ta : blueprint->textureAssets)
 			{
 				if (ta.first == CharacterSet::Widen(str))
 				{
-					if (sizeX != 0 && sizeY != 0) ta.second.resize(sizeX, sizeY).draw(pos().movedBy(posX, posY));
-					else ta.second.resize(blueprint->size).draw(pos().movedBy(posX, posY));
+					ta.second
+						.resize(blueprint->size)
+						.rotate(lua["machineAngle"].get<int>() * 90_deg)
+						.drawAt(transformedRegion().center());
 					return;
 				}
 			}
 		};
-		lua["setNode"] = [this](double x, double y, int state, bool fixed)
+
+		lua["setNode"] = [this](double x, double y, double dx, double dy, int state, bool fixed)
 		{
-			nodes.emplace_back(Vec2(x, y), this, NodeState(state), fixed);
+			nodes.emplace_back(Vec2(x, y), Vec2(dx, dy), this, NodeState(state), fixed);
 		};
 		lua["getNodeState"] = [this](int nodeID)
 		{
@@ -229,11 +231,11 @@ struct Machine
 		};
 		lua["machineLeftClicked"] = [this]()
 		{
-			return region().leftClicked();
+			return transformedRegion().leftClicked();
 		};
 		lua["machineRightClicked"] = [this]()
 		{
-			return region().leftClicked();
+			return transformedRegion().rightClicked();
 		};
 		lua["playAudio"] = [this](const char* str)
 		{
@@ -242,15 +244,20 @@ struct Machine
 		};
 		lua["addItem"] = [this](int x, int y)
 		{
-			items.emplace_back(pos() + Point(x, y));
+			items.emplace_back(pos() + transformedPos(Point(x, y)));
+		};
+		lua["removeItem"] = [this](int x, int y)
+		{
+			Point p = pos() + transformedPos(Point(x, y));
+			items.remove_if([&p](Item& i) { return i.from == p || i.to == p; });
 		};
 		lua["moveItem"] = [this](int fromX, int fromY, int toX, int toY, double t)
 		{
 			for (auto& i : items)
 			{
-				if (i.from == Point(fromX, fromY).movedBy(pos()))
+				if (i.from == pos() + transformedPos(Point(fromX, fromY)))
 				{
-					auto to = Point(toX, toY).movedBy(pos());
+					auto to = pos() + transformedPos(Point(toX, toY));
 					if (to != i.to)
 					{
 						bool flag = true;
@@ -278,7 +285,7 @@ struct Machine
 		{
 			for (auto& i : items)
 			{
-				if (i.from == Point(x, y).movedBy(pos()) || i.to == Point(x, y).movedBy(pos())) return true;
+				if (i.from == pos() + transformedPos(Point(x, y)) || i.to == pos() + transformedPos(Point(x, y))) return true;
 			}
 			return false;
 		};
@@ -286,6 +293,7 @@ struct Machine
 		lua["machinePosY"] = _pos.y;
 		lua["machineSizeX"] = blueprint->size.x;
 		lua["machineSizeY"] = blueprint->size.y;
+		lua["machineAngle"] = 0;
 		lua["init"]();
 
 	}
@@ -295,7 +303,7 @@ struct Machine
 
 		for (auto& n : nodes) n.draw();
 
-		if (selectedMachine == this) region().draw(Color(Palette::Orange, 128));
+		if (selectedMachine == this) transformedRegion().draw(Color(Palette::Orange, 128));
 	}
 
 	void	updateSystem()
@@ -312,9 +320,13 @@ struct Machine
 	{
 		return { lua["machinePosX"].get<int>(), lua["machinePosY"].get<int>() };
 	}
+	Size	size() const
+	{
+		return { lua["machineSizeX"].get<int>(), lua["machineSizeY"].get<int>() };
+	}
 	Rect	region() const
 	{
-		return Rect(pos(), blueprint->size);
+		return Rect(pos(), size());
 	}
 	void	setRegion(const RectF& _region)
 	{
@@ -323,17 +335,66 @@ struct Machine
 		lua["machineSizeX"] = int(_region.size.x);
 		lua["machineSizeY"] = int(_region.size.y);
 	}
+	int		angle() const
+	{
+		return lua["machineAngle"].get<int>();
+	}
+	void	setAngle(int _angle)
+	{
+		lua["machineAngle"] = _angle;
+	}
+	Rect	transformedRegion() const
+	{
+		if (lua["machineAngle"].get<int>() % 2 == 1) return Rect(region().pos, region().h, region().w);
+		return region();
+	}
+	Point	transformedPos(const Point& _pos) const
+	{
+		if (lua["machineAngle"].get<int>() == 0) return Point(_pos.x, _pos.y);
+		if (lua["machineAngle"].get<int>() == 1) return Point(size().y - 1 - _pos.y, _pos.x);
+		if (lua["machineAngle"].get<int>() == 2) return Point(size().x - 1 - _pos.x, size().y - 1 - _pos.y);
+		return Point(_pos.y, size().x - 1 - _pos.x);
+	}
+	Vec2	transformedPos(const Vec2& _pos) const
+	{
+		if (lua["machineAngle"].get<int>() == 0) return Vec2(_pos.x, _pos.y);
+		if (lua["machineAngle"].get<int>() == 1) return Vec2(size().y - _pos.y, _pos.x);
+		if (lua["machineAngle"].get<int>() == 2) return Vec2(size().x - _pos.x, size().y - _pos.y);
+		return Vec2(_pos.y, size().x - _pos.x);
+	}
 };
 
-RectF	Machine::newRegion;
+int		Machine::newMachineAngle;
+Rect	Machine::newMachineRegion;
 Assets*	Machine::assets;
 Machine*	Machine::selectedMachine = nullptr;
 Array<Item> Machine::items;
 Array<Blueprint>	Machine::blueprints;
 
+Bezier3	Wire::line() const
+{
+	const auto& p0 = from->pos();
+	const auto& p1 = from->pos() + from->dv.rotated(from->parentMachine->angle() * 90_deg);
+	const auto& p2 = to->pos() + to->dv.rotated(to->parentMachine->angle() * 90_deg);
+	const auto& p3 = to->pos();
+
+	return Bezier3(p0, p1, p2, p3);
+}
+void	Wire::draw()
+{
+	Color color = Color(0, 0);
+	switch (from->state)
+	{
+	case NodeState::Hi: color = Palette::Red;	break;
+	case NodeState::Low: color = Palette::Blue;	break;
+	case NodeState::None: color = Palette::White;	break;
+	}
+	line().draw(0.25, Palette::Black);
+	line().draw(0.125, color);
+}
 Vec2	Node::pos() const
 {
-	return parentMachine->pos().movedBy(inMachinePos);
+	return parentMachine->pos() + parentMachine->transformedPos(inMachinePos);
 }
 
 class Camera
@@ -354,17 +415,8 @@ public:
 			auto t = createTransformer2D();
 
 			double delta = Mouse::Wheel();
-			//if (drawingRegion.size.y >= 180_deg && delta > 0) delta = 0;
-			//if (drawingRegion.size.y <= 1.8_deg && delta < 0) delta = 0;
 			drawingRegion = drawingRegion.scaledAt(Cursor::PosF(), 1.0 + 0.1*delta);
 
-			/*
-			if (drawingRegion.size.y > 180_deg) drawingRegion = drawingRegion.scaledAt(drawingRegion.center(), (180_deg / drawingRegion.size.y));
-			if (drawingRegion.pos.y < -90_deg) drawingRegion.pos.y = -90_deg;
-			if (drawingRegion.pos.y + drawingRegion.size.y > 90_deg) drawingRegion.pos.y = 90_deg - drawingRegion.size.y;
-			if (smoothDrawingRegion.pos.x < -180_deg) { drawingRegion.pos.x += 360_deg; smoothDrawingRegion.pos.x += 360_deg; }
-			if (smoothDrawingRegion.pos.x > 180_deg) { drawingRegion.pos.x -= 360_deg; smoothDrawingRegion.pos.x -= 360_deg; }
-			*/
 			const double followingSpeed = 0.2;
 			smoothDrawingRegion.pos = smoothDrawingRegion.pos*(1.0 - followingSpeed) + drawingRegion.pos*followingSpeed;
 			smoothDrawingRegion.size = smoothDrawingRegion.size*(1.0 - followingSpeed) + drawingRegion.size*followingSpeed;
@@ -409,82 +461,29 @@ struct Game
 
 		machines.reserve(1024);
 
+		Point pos(0, 0);
 		for (int i = 0; i < int(Machine::blueprints.size()); i++)
 		{
-			for (int j = 0; j < 32; j++)
+			for (int j = 0; j < 128; j += Machine::blueprints[i].size.x)
 			{
-				machines.emplace_back(i, Point(5 * j, 4 * i));
+				machines.emplace_back(i, pos);
+				pos.moveBy(Machine::blueprints[i].size.x, 0);
 			}
+			pos.set(0, pos.y + Machine::blueprints[i].size.y);
 		}
 
 	}
 
 	void	update()
 	{
+		ClearPrint();
+		Print << L"選択中にRキーで回転できます。";
+		Print << L"カウンタは左下のピンが入力です";
+		//カメラ処理
 		camera.update();
 		auto t = camera.createTransformer2D();
 
-		if (MouseR.down()) rightClickedPoint = Cursor::PosF();
-		if (MouseR.up())
-		{
-			for (auto& w : wires)
-			{
-				if (w.line().intersects(Line(rightClickedPoint, Cursor::PosF())))
-				{
-					w.broken = true;
-				}
-			}
-		}
-		if (MouseL.down())
-		{
-			auto* node = mouseOverNode();
-
-			if (node == nullptr)
-			{
-				for (auto& m : machines)
-				{
-					if (m.region().leftClicked())
-					{
-						Machine::newRegion = RectF(m.region()).movedBy(0.5, 0.5);
-						Machine::selectedMachine = &m;
-					}
-				}
-			}
-			else
-			{
-				Node::selectedNode = node;
-			}
-		}
-		if (MouseL.up())
-		{
-			if (Machine::selectedMachine != nullptr)
-			{
-				bool flag = false;
-				for (auto& m : machines)
-				{
-					if (&m != Machine::selectedMachine && m.region().intersects(Rect(Machine::newRegion))) flag = true;
-				}
-
-				if (!flag) Machine::selectedMachine->setRegion(Machine::newRegion);
-
-				Machine::selectedMachine = nullptr;
-			}
-			if (Node::selectedNode != nullptr)
-			{
-				auto* node = mouseOverNode();
-
-				if (node != nullptr && node != Node::selectedNode)
-				{
-					wires.emplace_back(node, Node::selectedNode);
-				}
-				Node::selectedNode = nullptr;
-			}
-		}
-		if (Machine::selectedMachine != nullptr)
-		{
-			Machine::newRegion.moveBy(Cursor::DeltaF());
-		}
-
+		//信号初期化処理
 		for (auto& m : machines)
 		{
 			for (auto& n : m.nodes)
@@ -492,6 +491,8 @@ struct Game
 				if (!n.fixed) n.state = NodeState::None;
 			}
 		}
+
+		//信号伝達処理
 		for (;;)
 		{
 			bool flag = false;
@@ -506,45 +507,127 @@ struct Game
 			wires.remove_if([](Wire& w) { return w.broken; });
 			if (!flag) break;
 		}
+
+		//機械固有処理
 		for (auto& m : machines) m.updateSystem();
 
+		//背景描画
+		for (int x = 0; x < 128; x++) Line(x, 0, x, 128).draw(1 / 16.0, Palette::Black);
+		for (int x = 0; x < 128; x++) Line(0, x, 128, x).draw(1 / 16.0, Palette::Black);
+
+		//機械描画
 		for (auto& m : machines) m.draw();
-		if (mouseOverNode() == nullptr)
-		{
-			for (auto& m : machines)
-			{
-				if (m.region().mouseOver()) m.region().draw(Color(Palette::Green, 128));
-			}
-		}
+
+		//アイテム描画
 		for (auto& i : Machine::items) i.draw();
+
+		//ノードもしくは機械の選択
+		if (MouseL.down())
+		{
+			auto* node = mouseOverNode();
+			if (node == nullptr)
+			{
+				for (auto& m : machines)
+				{
+					if (m.transformedRegion().leftClicked())
+					{
+						Machine::newMachineRegion = m.transformedRegion();
+						Machine::newMachineAngle = m.angle();
+						Machine::selectedMachine = &m;
+					}
+				}
+			}
+			else Node::selectedNode = node;
+		}
+
+		//選択された機械の処理
 		if (Machine::selectedMachine != nullptr)
 		{
-			bool flag = false;
+			Machine::newMachineRegion = RectF(Machine::newMachineRegion).setCenter(Cursor::PosF().movedBy(0.5, 0.5));
+
+			if (KeyR.down())
+			{
+				Machine::newMachineRegion.size.set(Machine::newMachineRegion.size.y, Machine::newMachineRegion.size.x);
+				Machine::newMachineAngle = (Machine::newMachineAngle + 1) % 4;
+			}
+			if (MouseL.up())
+			{
+				bool flag = false;
+				for (auto& m : machines)
+				{
+					if (&m != Machine::selectedMachine && m.transformedRegion().intersects(Machine::newMachineRegion)) flag = true;
+				}
+
+				if (!flag)
+				{
+					Machine::selectedMachine->setAngle(Machine::newMachineAngle);
+					Machine::selectedMachine->setRegion(Rect(Machine::newMachineRegion.pos, Machine::selectedMachine->region().size));
+				}
+				Machine::selectedMachine = nullptr;
+			}
+			else
+			{
+				bool flag = false;
+				for (auto& m : machines)
+				{
+					if (&m != Machine::selectedMachine && m.transformedRegion().intersects(Machine::newMachineRegion)) flag = true;
+				}
+
+				Machine::selectedMachine->blueprint->texture(L"image.png")
+					->resize(Machine::selectedMachine->blueprint->size)
+					.rotate(Machine::newMachineAngle * 90_deg)
+					.drawAt(Machine::newMachineRegion.center(), Color(255, 128));
+
+				if (flag) Machine::newMachineRegion.draw(Color(Palette::Red, 128)).drawFrame(0.1, 0, Palette::Red);
+				else Machine::newMachineRegion.draw(Color(Palette::Orange, 128)).drawFrame(0.1, 0, Palette::Orange);
+			}
+		}
+		else if (mouseOverNode() == nullptr)
+		{
+			//機械に選択予定の表示
 			for (auto& m : machines)
 			{
-				if (&m != Machine::selectedMachine && m.region().intersects(Rect(Machine::newRegion))) flag = true;
+				if (m.transformedRegion().mouseOver()) m.transformedRegion().draw(Color(Palette::Green, 128));
 			}
-
-			if (flag) Rect(Machine::newRegion).draw(Color(Palette::Red, 128)).drawFrame(0.1, 0, Palette::Red);
-			else Rect(Machine::newRegion).draw(Color(Palette::Orange, 128)).drawFrame(0.1, 0, Palette::Orange);
 		}
 		for (auto& w : wires) w.draw();
+
+		//選択されたノードの処理
 		if (Node::selectedNode != nullptr)
 		{
-			Color color = Color(0, 0);
-			switch (Node::selectedNode->state)
+			if (MouseL.up())
 			{
-			case NodeState::Hi: color = Palette::Red;	break;
-			case NodeState::Low: color = Palette::Blue;	break;
-			case NodeState::None: color = Palette::White;	break;
+				auto* node = mouseOverNode();
+
+				if (node != nullptr && node != Node::selectedNode)
+				{
+					wires.emplace_back(node, Node::selectedNode);
+				}
+				Node::selectedNode = nullptr;
 			}
-			Line(Node::selectedNode->pos(), Cursor::PosF()).draw(0.25, Palette::Black).draw(0.125, color);
+			else
+			{
+				Color color = Color(0, 0);
+				switch (Node::selectedNode->state)
+				{
+				case NodeState::Hi: color = Palette::Red;	break;
+				case NodeState::Low: color = Palette::Blue;	break;
+				case NodeState::None: color = Palette::White;	break;
+				}
+				Line(Node::selectedNode->pos(), Cursor::PosF()).draw(0.25, Palette::Black).draw(0.125, color);
+			}
 		}
 
-		if (MouseR.pressed())
+		//配線削除
+		if (MouseR.down()) rightClickedPoint = Cursor::PosF();
+		if (MouseR.up())
 		{
-			Line(rightClickedPoint, Cursor::PosF()).draw(0.125, Palette::Red);
+			for (auto& w : wires)
+			{
+				if (Line(w.from->pos(), w.to->pos()).intersects(Line(rightClickedPoint, Cursor::PosF()))) w.broken = true;
+			}
 		}
+		if (MouseR.pressed()) Line(rightClickedPoint, Cursor::PosF()).draw(0.125, Palette::Red);
 	}
 
 	Node*	mouseOverNode()
