@@ -13,12 +13,12 @@ function updateSystem()
                 addItem(3, 1)
             end
         else
-            if energy == 0 then playAudio("sound1.mp3") end
-            if energy == 60 then playAudio("sound1.mp3") end
-            if energy == 120 then playAudio("sound1.mp3") end
-            if energy == 180 then playAudio("sound1.mp3") end
-            if energy == 240 then playAudio("sound1.mp3") end
-            if energy == 300 then playAudio("sound1.mp3") end
+            if energy == 0 then playAudio("sound1.mp3", 0.25) end
+            if energy == 60 then playAudio("sound1.mp3", 0.25) end
+            if energy == 120 then playAudio("sound1.mp3", 0.25) end
+            if energy == 180 then playAudio("sound1.mp3", 0.25) end
+            if energy == 240 then playAudio("sound1.mp3", 0.25) end
+            if energy == 300 then playAudio("sound1.mp3", 0.25) end
             energy = energy + 2
         end
     end

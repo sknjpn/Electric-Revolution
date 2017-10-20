@@ -6,12 +6,14 @@ function init()
 end
 
 function updateSystem()
-    i = i + 1
-    if i == 4 then
-        i = 0
-        j = j + 1
-        if j == 9 then
-            j = 1
+    if isItemPos(1, 0) or isItemPos(0, 0) then
+        i = i + 1
+        if i == 4 then
+            i = 0
+            j = j + 1
+            if j == 9 then
+                j = 1
+            end
         end
     end
     
