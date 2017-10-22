@@ -9,7 +9,7 @@ function updateSystem()
     
     if isItemPos(0, 1) then
         i = i + 1
-        moveItem(0, 1, 1, 1, 0.0156)
+        moveItem(0, 1, 0, 0.0625)
         if i == 4 then
             i = 0
             j = j + 1
@@ -30,5 +30,13 @@ end
 function draw()
     drawTexture("image.png")
 
-    drawTexture("conveyor"..j..".png", 3, 1, 1, 1)
+    drawTextureAt("conveyor/conveyor"..j..".png", 0, 1, 1, 1)
+end
+
+function canPutItemAt(x, y, id)
+    if (x == 1 and y == 1) or (x == 0 and y == 1) then
+        return true
+    else
+        return false
+    end
 end

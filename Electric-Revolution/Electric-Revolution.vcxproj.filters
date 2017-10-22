@@ -5,10 +5,6 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
-    </Filter>
     <Filter Include="Resource Files">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
@@ -58,10 +54,61 @@
     <Filter Include="Resource Files\dll_x86\tobii">
       <UniqueIdentifier>{00092991-0e64-42e3-be02-06c90ba3a9cb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="stdafx">
+      <UniqueIdentifier>{c61884b7-7fa1-4346-81de-ac3444c0e6a3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Item">
+      <UniqueIdentifier>{cc8eae8b-f0ec-44a0-8910-04c7835b1da4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Machine">
+      <UniqueIdentifier>{a6e3967e-1f58-4950-a1fd-5ca158b9346a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Node">
+      <UniqueIdentifier>{389f21c9-1fd7-478d-a2d6-c49e970804a1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Wire">
+      <UniqueIdentifier>{763b872f-7b29-43ae-8c72-ea7e36ab57da}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Camera">
+      <UniqueIdentifier>{66ff7c59-5058-45b1-88d2-cdcdd14e8716}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game">
+      <UniqueIdentifier>{d2b18f8d-f04e-49fc-90c3-8b298426f81d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Factory">
+      <UniqueIdentifier>{a2ded7f5-26a8-4812-aa03-b590e5f1ba20}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>stdafx</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="Game.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Item.cpp">
+      <Filter>Item</Filter>
+    </ClCompile>
+    <ClCompile Include="Factory.cpp">
+      <Filter>Factory</Filter>
+    </ClCompile>
+    <ClCompile Include="Node.cpp">
+      <Filter>Node</Filter>
+    </ClCompile>
+    <ClCompile Include="Wire.cpp">
+      <Filter>Wire</Filter>
+    </ClCompile>
+    <ClCompile Include="Machine.cpp">
+      <Filter>Machine</Filter>
+    </ClCompile>
+    <ClCompile Include="Machine.initLua.cpp">
+      <Filter>Machine</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -197,5 +244,31 @@
     <Media Include="example\test.mp3">
       <Filter>Resource Files\example</Filter>
     </Media>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h">
+      <Filter>stdafx</Filter>
+    </ClInclude>
+    <ClInclude Include="Wire.h">
+      <Filter>Wire</Filter>
+    </ClInclude>
+    <ClInclude Include="Node.h">
+      <Filter>Node</Filter>
+    </ClInclude>
+    <ClInclude Include="Machine.h">
+      <Filter>Machine</Filter>
+    </ClInclude>
+    <ClInclude Include="Item.h">
+      <Filter>Item</Filter>
+    </ClInclude>
+    <ClInclude Include="Factory.h">
+      <Filter>Factory</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="Game.h">
+      <Filter>Game</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
