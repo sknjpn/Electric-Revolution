@@ -35,18 +35,6 @@ Machine::Machine(int _type, Point _pos, Factory* _factory)
 	, pos(_pos)
 	, angle(0)
 {
-	auto dc = FileSystem::DirectoryContents(blueprint->mainFile);
-	for (auto& c : dc)
-	{
-		if (FileSystem::IsFile(c))
-		{
-			auto ex = FileSystem::Extension(c);
-			if (ex == L"mp3" || ex == L"wav")
-			{
-				audioAssets.emplace_back(c.removed(blueprint->mainFile), Audio(c));
-			}
-		}
-	}
 
 	initLua();
 

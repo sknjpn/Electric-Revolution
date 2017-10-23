@@ -10,7 +10,7 @@ function updateSystem()
         clearKineticEnergy(4, 1)
         addKineticEnergy(100.0, 4, 1)
         i = i + 1
-        if i == 4 then
+        if i == 1 then
             i = 0
             j = j + 1
             if j == 6 then

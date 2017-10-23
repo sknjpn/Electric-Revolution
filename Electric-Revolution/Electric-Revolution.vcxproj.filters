@@ -9,9 +9,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Resource Files\example">
-      <UniqueIdentifier>{8b04c3b0-3b5b-4f9a-add9-f54abc0118ed}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Resource Files\engine">
       <UniqueIdentifier>{972ca6b5-b566-47a1-b6e5-5cd538d7268c}</UniqueIdentifier>
     </Filter>
@@ -78,6 +75,9 @@
     <Filter Include="Factory">
       <UniqueIdentifier>{a2ded7f5-26a8-4812-aa03-b590e5f1ba20}</UniqueIdentifier>
     </Filter>
+    <Filter Include="UI">
+      <UniqueIdentifier>{31c3f01e-89e9-492e-a96c-cd241f921dc1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -115,12 +115,6 @@
     <Image Include="Icon.ico">
       <Filter>Resource Files</Filter>
     </Image>
-    <Image Include="example\siv3d-kun.png">
-      <Filter>Resource Files\example</Filter>
-    </Image>
-    <Image Include="example\windmill.png">
-      <Filter>Resource Files\example</Filter>
-    </Image>
     <Image Include="engine\texture\box-shadow\64.png">
       <Filter>Resource Files\engine\texture\box-shadow</Filter>
     </Image>
@@ -146,12 +140,6 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="example\LICENSE.txt">
-      <Filter>Resource Files\example</Filter>
-    </Text>
-    <Text Include="example\test.txt">
-      <Filter>Resource Files\example</Filter>
-    </Text>
     <Text Include="engine\font\fontawesome\LICENSE_OFL.txt">
       <Filter>Resource Files\engine\font\fontawesome</Filter>
     </Text>
@@ -161,20 +149,8 @@
     <Text Include="engine\engine.txt">
       <Filter>Resource Files\engine</Filter>
     </Text>
-    <Text Include="example\script.txt">
-      <Filter>Resource Files\example</Filter>
-    </Text>
   </ItemGroup>
   <ItemGroup>
-    <None Include="example\test.ini">
-      <Filter>Resource Files\example</Filter>
-    </None>
-    <None Include="example\empty.bin">
-      <Filter>Resource Files\example</Filter>
-    </None>
-    <None Include="example\test.json">
-      <Filter>Resource Files\example</Filter>
-    </None>
     <None Include="engine\shader\shape.ps">
       <Filter>Resource Files\engine\shader</Filter>
     </None>
@@ -239,11 +215,6 @@
       <Filter>Resource Files\dll_x86\d3d</Filter>
     </None>
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Media Include="example\test.mp3">
-      <Filter>Resource Files\example</Filter>
-    </Media>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">

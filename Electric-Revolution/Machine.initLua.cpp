@@ -64,13 +64,24 @@ void	Machine::initLua()
 	};
 	lua["playAudio"] = [this](const char* str)
 	{
+		const String& name = CharacterSet::Widen(str);
 		for (auto& ta : audioAssets)
 		{
-			if (ta.first == CharacterSet::Widen(str))
+			if (ta.first == name)
 			{
 				ta.second.stop();
 				ta.second.play();
 				return;
+			}
+		}
+
+		auto dc = FileSystem::DirectoryContents(blueprint->mainFile);
+		for (auto& c : dc)
+		{
+			if (c.removed(blueprint->mainFile) == name)
+			{
+				audioAssets.emplace_back(c.removed(blueprint->mainFile), Audio(c));
+				audioAssets.back().second.play();
 			}
 		}
 	};
@@ -87,7 +98,10 @@ void	Machine::initLua()
 	lua["moveItem"] = [this](int fromX, int fromY, int _angle, double t)
 	{
 		const auto& p = pos + transformedPos(Point(fromX, fromY));
-		if (factory->itemMap.at(p) != nullptr) factory->itemMap.at(p)->move((angle + _angle) % 4, t);
+		if (factory->itemMap.at(p) != nullptr && factory->itemMap.at(p)->p == p)
+		{
+			factory->itemMap.at(p)->move((angle + _angle) % 4, t);
+		}
 	};
 	lua["addKineticEnergy"] = [this](double value, int x, int y)
 	{

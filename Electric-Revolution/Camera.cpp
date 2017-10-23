@@ -12,10 +12,25 @@ void	Camera::update()
 
 		double delta = Mouse::Wheel();
 		drawingRegion = drawingRegion.scaledAt(Cursor::PosF(), 1.0 + 0.1*delta);
+
+		auto m = Window::Size().y / drawingRegion.h;
+
+		//Šg‘å“x‚Ì’²ß
+		double mMin = Max(16.0, Max(Window::Size().x / restrictedRegion.w, Window::Size().y / restrictedRegion.h));
+		double mMax = 64.0;
+		if (m > mMax) drawingRegion = drawingRegion.scaledAt(Cursor::PosF(), m / mMax);
+		if (m < mMin) drawingRegion = drawingRegion.scaledAt(Cursor::PosF(), m / mMin);
+
+		//•`‰æ—Ìˆæ‚Ì’²ß
+		if (drawingRegion.x < restrictedRegion.x) drawingRegion.x = restrictedRegion.x;
+		if (drawingRegion.y < restrictedRegion.y) drawingRegion.y = restrictedRegion.y;
+		if (drawingRegion.br().x > restrictedRegion.br().x) drawingRegion.x -= drawingRegion.br().x - restrictedRegion.br().x;
+		if (drawingRegion.br().y > restrictedRegion.br().y) drawingRegion.y -= drawingRegion.br().y - restrictedRegion.br().y;
+
 		const double followingSpeed = 0.2;
 		smoothDrawingRegion.pos = smoothDrawingRegion.pos*(1.0 - followingSpeed) + drawingRegion.pos*followingSpeed;
 		smoothDrawingRegion.size = smoothDrawingRegion.size*(1.0 - followingSpeed) + drawingRegion.size*followingSpeed;
-		
+
 	}
 
 	if (Window::GetState().focused)

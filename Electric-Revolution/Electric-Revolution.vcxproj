@@ -198,8 +198,6 @@
     <Image Include="engine\texture\box-shadow\32.png" />
     <Image Include="engine\texture\box-shadow\64.png" />
     <Image Include="engine\texture\box-shadow\8.png" />
-    <Image Include="example\siv3d-kun.png" />
-    <Image Include="example\windmill.png" />
     <Image Include="Icon.ico" />
   </ItemGroup>
   <ItemGroup>
@@ -209,9 +207,6 @@
     <Text Include="engine\engine.txt" />
     <Text Include="engine\font\fontawesome\LICENSE_OFL.txt" />
     <Text Include="engine\font\noto\LICENSE_OFL.txt" />
-    <Text Include="example\LICENSE.txt" />
-    <Text Include="example\script.txt" />
-    <Text Include="example\test.txt" />
   </ItemGroup>
   <ItemGroup>
     <None Include="dll_x64\d3d\d3dcompiler_47.dll" />
@@ -235,13 +230,7 @@
     <None Include="engine\shader\sprite.ps" />
     <None Include="engine\shader\sprite.vs" />
     <None Include="engine\shader\sprite_sdf.ps" />
-    <None Include="example\empty.bin" />
-    <None Include="example\test.ini" />
-    <None Include="example\test.json" />
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Media Include="example\test.mp3" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
