@@ -36,7 +36,7 @@ void	Camera::update()
 	if (Window::GetState().focused)
 	{
 		const double slidingSpeed = (drawingRegion.size.y / 180_deg)*0.05;
-		const bool useKeyViewControl = true;
+		const bool useKeyViewControl = false;
 
 		if ((useKeyViewControl && KeyA.pressed()) || Cursor::Pos().x <= 0) drawingRegion.pos.x -= slidingSpeed;
 		if ((useKeyViewControl && KeyW.pressed()) || Cursor::Pos().y <= 0) drawingRegion.pos.y -= slidingSpeed;

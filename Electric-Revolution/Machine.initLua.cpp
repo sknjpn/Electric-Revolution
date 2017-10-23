@@ -58,6 +58,10 @@ void	Machine::initLua()
 	{
 		return region().leftClicked();
 	};
+	lua["machineLeftPressed"] = [this]()
+	{
+		return region().leftPressed();
+	};
 	lua["machineRightClicked"] = [this]()
 	{
 		return region().rightClicked();

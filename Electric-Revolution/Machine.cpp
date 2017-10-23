@@ -43,10 +43,6 @@ Machine::Machine(int _type, Point _pos, Factory* _factory)
 void	Machine::draw()
 {
 	if (lua["draw"].get_type() == sol::type::function) lua["draw"]();
-
-	for (auto& n : nodes) n.draw();
-
-	if (selectedMachine == this) region().draw(Color(Palette::Orange, 128));
 }
 
 void	Machine::updateSystem()

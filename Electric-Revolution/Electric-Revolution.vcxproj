@@ -175,6 +175,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="drawFactory.cpp" />
     <ClCompile Include="Machine.initLua.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Factory.cpp" />
@@ -189,6 +190,8 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="UI.cpp" />
+    <ClCompile Include="updateFactory.cpp" />
     <ClCompile Include="Wire.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -240,6 +243,7 @@
     <ClInclude Include="Machine.h" />
     <ClInclude Include="Node.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="UI.h" />
     <ClInclude Include="Wire.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
