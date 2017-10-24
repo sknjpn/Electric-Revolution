@@ -9,6 +9,7 @@ void	Game::drawFactory(Factory* _f)
 		//‹@ŠB‚Ì‰¹—Ê§Œä
 		for (auto& m : _f->machines)
 		{
+			if (m.isVirtual) continue;
 			Vec3 pos1(camera.drawingRegion.center().x, camera.drawingRegion.center().y, camera.drawingRegion.w / 2.0);
 			Vec3 pos2(m.region().center().x, m.region().center().y, 0.0);
 			for (auto& a : m.audioAssets)
@@ -39,6 +40,7 @@ void	Game::drawFactory(Factory* _f)
 		//‹@ŠB•`‰æ
 		for (auto& m : _f->machines)
 		{
+			if (m.isVirtual) continue;
 			m.draw();
 
 			if (ui.uiMode == UIMode::EditWireMode)
@@ -53,12 +55,13 @@ void	Game::drawFactory(Factory* _f)
 
 		for (auto& m : _f->machines)
 		{
+			if (m.isVirtual) continue;
 			for (auto& ta : m.blueprint->textureAssets)
 			{
 				if (ta.first == L"coverImage.png")
 				{
 					ta.second
-						.resize(m.blueprint->size)
+						.resize(m.baseSize)
 						.rotate(m.angle * 90_deg)
 						.drawAt(m.region().center());
 					break;
@@ -105,30 +108,44 @@ void	Game::drawFactory(Factory* _f)
 			}
 			if (MouseL.up() || ui.uiMode != UIMode::EditMachineMode)
 			{
-				bool flag = !Machine::newMachineRegion.pos.intersects(Rect(_f->size)) || !Machine::newMachineRegion.br().movedBy(-1, -1).intersects(Rect(_f->size));
-				for (auto& m : _f->machines)
+				if (ui.trashAreaMouseOver)
 				{
-					if (&m != sm && m.region().intersects(Machine::newMachineRegion)) flag = true;
+					sm->isVirtual = true;
 				}
-
-				if (!flag)
+				else
 				{
-
-					for (auto& p : step(sm->region().pos, sm->region().size))
+					bool flag = !Machine::newMachineRegion.pos.intersects(Rect(_f->size)) || !Machine::newMachineRegion.br().movedBy(-1, -1).intersects(Rect(_f->size));
+					for (auto& m : _f->machines)
 					{
-						if (_f->itemMap.at(p) != nullptr) _f->itemMap.at(p)->erase();
-						_f->machineMap.at(p) = nullptr;
-						_f->keMap.at(p) = 0;
+						if (&m != sm && m.region().intersects(Machine::newMachineRegion)) flag = true;
 					}
-					sm->angle = Machine::newMachineAngle;
-					sm->pos = Machine::newMachineRegion.pos;
 
-					for (auto& p : step(sm->region().pos, sm->region().size))
+					if (!flag)
 					{
-						_f->machineMap.at(p) = sm;
-						_f->keMap.at(p) = 0;
+
+						if (sm->isVirtual == false)
+						{
+							for (auto& p : step(sm->region().pos, sm->region().size))
+							{
+								if (_f->itemMap.at(p) != nullptr) _f->itemMap.at(p)->erase();
+								_f->machineMap.at(p) = nullptr;
+								_f->keMap.at(p) = 0;
+							}
+							sm->angle = Machine::newMachineAngle;
+							sm->pos = Machine::newMachineRegion.pos;
+						}
+						else sm->isVirtual = false;
+						sm->angle = Machine::newMachineAngle;
+						sm->pos = Machine::newMachineRegion.pos;
+						for (auto& p : step(sm->region().pos, sm->region().size))
+						{
+
+							_f->machineMap.at(p) = sm;
+							_f->keMap.at(p) = 0;
+						}
 					}
 				}
+				if (sm->isVirtual) sm->pos.set(-1000, -1000);
 				Machine::selectedMachine = nullptr;
 			}
 			else
@@ -140,7 +157,7 @@ void	Game::drawFactory(Factory* _f)
 				}
 
 				sm->blueprint->texture(L"image.png")
-					->resize(sm->blueprint->size)
+					->resize(sm->baseSize)
 					.rotate(Machine::newMachineAngle * 90_deg)
 					.drawAt(Machine::newMachineRegion.center(), Color(255, 128));
 
@@ -156,7 +173,7 @@ void	Game::drawFactory(Factory* _f)
 				if (m.region().mouseOver()) m.region().draw(Color(Palette::Green, 128));
 			}
 		}
-		for (auto& w : _f->wires) w.draw();
+		for (auto& w : _f->wires) w.line().draw(0.125, w.color);
 
 		//‘I‘ð‚³‚ê‚½ƒm[ƒh‚Ìˆ—
 		if (Node::selectedNode != nullptr)
@@ -168,26 +185,18 @@ void	Game::drawFactory(Factory* _f)
 
 				if (node != nullptr && node != sn)
 				{
-					_f->wires.emplace_back(node, sn);
+					_f->wires.emplace_back(node, sn, Wire::selectedColor);
+					Wire::selectedColor = RandomHSV();
 				}
 				Node::selectedNode = nullptr;
 			}
 			else
 			{
-				Color color = Color(0, 0);
-				switch (sn->state)
-				{
-				case NodeState::Hi: color = Palette::Red;	break;
-				case NodeState::Low: color = Palette::Blue;	break;
-				case NodeState::None: color = Palette::White;	break;
-				}
-
 				const auto& p0 = sn->pos();
 				const auto& p1 = sn->pos() + sn->dv.rotated(sn->parentMachine->angle * 90_deg);
 				const auto& p2 = Cursor::PosF();
 				const auto& p3 = Cursor::PosF();
-				Bezier3(p0, p1, p2, p3).draw(0.25, Palette::Black);
-				Bezier3(p0, p1, p2, p3).draw(0.125, color);
+				Bezier3(p0, p1, p2, p3).draw(0.125, Wire::selectedColor);
 			}
 		}
 
@@ -203,7 +212,7 @@ void	Game::drawFactory(Factory* _f)
 					{
 						if (Line(ls[i], ls[i + 1]).intersects(Line(rightClickedPoint, Cursor::PosF())))
 						{
-							w.line().draw(0.250, Palette::Red);
+							w.line().draw(0.1875, Palette::Red);
 							break;
 						}
 					}
@@ -225,7 +234,7 @@ void	Game::drawFactory(Factory* _f)
 					}
 				}
 			}
-			if (MouseR.pressed()) Line(rightClickedPoint, Cursor::PosF()).draw(0.125, Palette::Red);
+			if (MouseR.pressed()) Line(rightClickedPoint, Cursor::PosF()).draw(0.1875, Palette::Red);
 		}
 	}
 

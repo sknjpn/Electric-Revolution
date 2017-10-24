@@ -6,8 +6,10 @@ progress = 0
 fire = 1500
 before = 0
 after = 0
-function init()
-    
+function isInProcess()
+    if before >= 2 and after <= 1000 then
+        return true
+    end
 end
 
 function updateSystem()

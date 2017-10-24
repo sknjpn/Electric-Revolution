@@ -7,16 +7,18 @@ struct Node;
 
 struct Factory
 {
+	bool	isMain;
+	Size	size;
+	String	name;
+	Texture	tile;
 	Array<Item> items;
 	Array<Wire>	wires;
 	Grid<Item*>	itemMap;
 	Grid<double>	keMap;
-	Array<Machine>	machines;
 	Grid<Machine*>	machineMap;
-	Size	size;
-	Texture	tile;
-	
-	Factory(const Size& _size);
+	Array<Machine>	machines;
+
+	Factory();
 	Node*	mouseOverNode();
 	bool	canMoveItemTo(const Point& _pos, int _id);
 };

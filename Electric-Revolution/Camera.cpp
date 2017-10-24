@@ -4,6 +4,8 @@ Camera::Camera()
 	: restrictedRegion(Vec2(-2048, -2048), 3 * Vec2(2048, 2048))
 	, drawingRegion(0, 0, 32, 32)
 	, smoothDrawingRegion(drawingRegion)
+	, magnificationMax(64.0)
+	, magnificationMin(16.0)
 {}
 void	Camera::update()
 {
@@ -16,8 +18,8 @@ void	Camera::update()
 		auto m = Window::Size().y / drawingRegion.h;
 
 		//Šg‘å“x‚Ì’²ß
-		double mMin = Max(16.0, Max(Window::Size().x / restrictedRegion.w, Window::Size().y / restrictedRegion.h));
-		double mMax = 64.0;
+		double mMin = Max(magnificationMin, Max(Window::Size().x / restrictedRegion.w, Window::Size().y / restrictedRegion.h));
+		double mMax = magnificationMax;
 		if (m > mMax) drawingRegion = drawingRegion.scaledAt(Cursor::PosF(), m / mMax);
 		if (m < mMin) drawingRegion = drawingRegion.scaledAt(Cursor::PosF(), m / mMin);
 
@@ -36,7 +38,7 @@ void	Camera::update()
 	if (Window::GetState().focused)
 	{
 		const double slidingSpeed = (drawingRegion.size.y / 180_deg)*0.05;
-		const bool useKeyViewControl = false;
+		const bool useKeyViewControl = true;
 
 		if ((useKeyViewControl && KeyA.pressed()) || Cursor::Pos().x <= 0) drawingRegion.pos.x -= slidingSpeed;
 		if ((useKeyViewControl && KeyW.pressed()) || Cursor::Pos().y <= 0) drawingRegion.pos.y -= slidingSpeed;

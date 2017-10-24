@@ -17,7 +17,7 @@ void	Machine::initLua()
 			if (ta.first == CharacterSet::Widen(str))
 			{
 				ta.second
-					.resize(blueprint->size)
+					.resize(baseSize)
 					.rotate(angle * 90_deg)
 					.drawAt(region().center());
 				return;
@@ -68,6 +68,7 @@ void	Machine::initLua()
 	};
 	lua["playAudio"] = [this](const char* str)
 	{
+		if (!factory->isMain) return;
 		const String& name = CharacterSet::Widen(str);
 		for (auto& ta : audioAssets)
 		{
@@ -128,7 +129,11 @@ void	Machine::initLua()
 	};
 	lua["isItemPos"] = [this](int x, int y)
 	{
-		if (factory->itemMap.at(pos + transformedPos(Point(x, y))) != nullptr) return true;
+		Point p(pos + transformedPos(Point(x, y)));
+		if (p.x >= 0 && p.y >= 0 && p.x < factorySize().x && p.y < factorySize().y)
+		{
+			return factory->itemMap.at(pos + transformedPos(Point(x, y))) != nullptr;
+		}
 		return false;
 	};
 	lua["machinePosX"] = [this]()
@@ -149,8 +154,8 @@ void	Machine::initLua()
 		return p.x == -1 || p.y == -1 || p.x == factorySize().x || p.y == factorySize().y;
 	};
 
-	lua["machineSizeX"] = blueprint->size.x;
-	lua["machineSizeY"] = blueprint->size.y;
+	lua["machineSizeX"] = baseSize.x;
+	lua["machineSizeY"] = baseSize.y;
 	lua["machineAngle"] = 0;
 
 	if (lua["init"].get_type() == sol::type::function) lua["init"]();

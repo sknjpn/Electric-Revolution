@@ -54,70 +54,88 @@
     <Filter Include="stdafx">
       <UniqueIdentifier>{c61884b7-7fa1-4346-81de-ac3444c0e6a3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Item">
-      <UniqueIdentifier>{cc8eae8b-f0ec-44a0-8910-04c7835b1da4}</UniqueIdentifier>
+    <Filter Include="Main">
+      <UniqueIdentifier>{bb313ad3-82fb-4eac-98c2-d2d8c357b9d8}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Machine">
-      <UniqueIdentifier>{a6e3967e-1f58-4950-a1fd-5ca158b9346a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Node">
+    <Filter Include="Main\Node">
       <UniqueIdentifier>{389f21c9-1fd7-478d-a2d6-c49e970804a1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Wire">
-      <UniqueIdentifier>{763b872f-7b29-43ae-8c72-ea7e36ab57da}</UniqueIdentifier>
+    <Filter Include="Main\Machine">
+      <UniqueIdentifier>{a6e3967e-1f58-4950-a1fd-5ca158b9346a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Camera">
-      <UniqueIdentifier>{66ff7c59-5058-45b1-88d2-cdcdd14e8716}</UniqueIdentifier>
+    <Filter Include="Main\Item">
+      <UniqueIdentifier>{cc8eae8b-f0ec-44a0-8910-04c7835b1da4}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game">
+    <Filter Include="Main\Game">
       <UniqueIdentifier>{d2b18f8d-f04e-49fc-90c3-8b298426f81d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Factory">
+    <Filter Include="Main\Wire">
+      <UniqueIdentifier>{763b872f-7b29-43ae-8c72-ea7e36ab57da}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Main\UI">
+      <UniqueIdentifier>{31c3f01e-89e9-492e-a96c-cd241f921dc1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Main\Camera">
+      <UniqueIdentifier>{66ff7c59-5058-45b1-88d2-cdcdd14e8716}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Main\Factory">
       <UniqueIdentifier>{a2ded7f5-26a8-4812-aa03-b590e5f1ba20}</UniqueIdentifier>
     </Filter>
-    <Filter Include="UI">
-      <UniqueIdentifier>{31c3f01e-89e9-492e-a96c-cd241f921dc1}</UniqueIdentifier>
+    <Filter Include="Assets">
+      <UniqueIdentifier>{062fc55d-0112-4bec-9c63-132ccab07536}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Main\Map">
+      <UniqueIdentifier>{34bf7d7f-2e25-4522-8786-6cdf23d8c133}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Main\Scuttle">
+      <UniqueIdentifier>{0e5c9234-3f57-48e4-81a2-9643e4202a4c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="stdafx.cpp">
       <Filter>stdafx</Filter>
     </ClCompile>
     <ClCompile Include="Camera.cpp">
-      <Filter>Camera</Filter>
+      <Filter>Main\Camera</Filter>
     </ClCompile>
     <ClCompile Include="Game.cpp">
-      <Filter>Game</Filter>
+      <Filter>Main\Game</Filter>
     </ClCompile>
     <ClCompile Include="Item.cpp">
-      <Filter>Item</Filter>
+      <Filter>Main\Item</Filter>
     </ClCompile>
     <ClCompile Include="Factory.cpp">
-      <Filter>Factory</Filter>
+      <Filter>Main\Factory</Filter>
     </ClCompile>
     <ClCompile Include="Node.cpp">
-      <Filter>Node</Filter>
+      <Filter>Main\Node</Filter>
     </ClCompile>
     <ClCompile Include="Wire.cpp">
-      <Filter>Wire</Filter>
+      <Filter>Main\Wire</Filter>
     </ClCompile>
     <ClCompile Include="Machine.cpp">
-      <Filter>Machine</Filter>
+      <Filter>Main\Machine</Filter>
     </ClCompile>
     <ClCompile Include="Machine.initLua.cpp">
-      <Filter>Machine</Filter>
+      <Filter>Main\Machine</Filter>
     </ClCompile>
     <ClCompile Include="UI.cpp">
-      <Filter>UI</Filter>
+      <Filter>Main\UI</Filter>
     </ClCompile>
     <ClCompile Include="updateFactory.cpp">
-      <Filter>Game</Filter>
+      <Filter>Main\Game</Filter>
     </ClCompile>
     <ClCompile Include="drawFactory.cpp">
-      <Filter>Game</Filter>
+      <Filter>Main\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Map.cpp">
+      <Filter>Main\Map</Filter>
+    </ClCompile>
+    <ClCompile Include="Main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Scuttle.cpp">
+      <Filter>Main\Scuttle</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -230,28 +248,34 @@
       <Filter>stdafx</Filter>
     </ClInclude>
     <ClInclude Include="Wire.h">
-      <Filter>Wire</Filter>
+      <Filter>Main\Wire</Filter>
     </ClInclude>
     <ClInclude Include="Node.h">
-      <Filter>Node</Filter>
+      <Filter>Main\Node</Filter>
     </ClInclude>
     <ClInclude Include="Machine.h">
-      <Filter>Machine</Filter>
+      <Filter>Main\Machine</Filter>
     </ClInclude>
     <ClInclude Include="Item.h">
-      <Filter>Item</Filter>
+      <Filter>Main\Item</Filter>
     </ClInclude>
     <ClInclude Include="Factory.h">
-      <Filter>Factory</Filter>
+      <Filter>Main\Factory</Filter>
     </ClInclude>
     <ClInclude Include="Camera.h">
-      <Filter>Camera</Filter>
+      <Filter>Main\Camera</Filter>
     </ClInclude>
     <ClInclude Include="Game.h">
-      <Filter>Game</Filter>
+      <Filter>Main\Game</Filter>
     </ClInclude>
     <ClInclude Include="UI.h">
-      <Filter>UI</Filter>
+      <Filter>Main\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Map.h">
+      <Filter>Main\Map</Filter>
+    </ClInclude>
+    <ClInclude Include="Scuttle.h">
+      <Filter>Main\Scuttle</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

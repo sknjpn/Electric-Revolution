@@ -183,7 +183,9 @@
     <ClCompile Include="Item.cpp" />
     <ClCompile Include="Machine.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Map.cpp" />
     <ClCompile Include="Node.cpp" />
+    <ClCompile Include="Scuttle.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -241,7 +243,9 @@
     <ClInclude Include="Game.h" />
     <ClInclude Include="Item.h" />
     <ClInclude Include="Machine.h" />
+    <ClInclude Include="Map.h" />
     <ClInclude Include="Node.h" />
+    <ClInclude Include="Scuttle.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="UI.h" />
     <ClInclude Include="Wire.h" />

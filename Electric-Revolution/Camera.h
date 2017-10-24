@@ -6,6 +6,8 @@ public:
 	RectF	restrictedRegion;
 	RectF	drawingRegion;
 	RectF	smoothDrawingRegion;
+	double	magnificationMax;
+	double	magnificationMin;
 
 	Camera();
 

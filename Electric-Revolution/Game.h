@@ -2,17 +2,31 @@
 #include"Camera.h"
 #include"Factory.h"
 #include"UI.h"
+#include"Map.h"
+#include<HamFramework.hpp>
+
+
+enum struct GameState {
+	Title,
+	MapView,
+	FactoryView,
+	Tutorial,
+};
 
 struct Game
 {
 	UI	ui;
+	Map	map;
+	Audio	bgm;
 	Camera	camera;
 	Vec2	rightClickedPoint;
 	Factory*	mainFactory;
-	Array<Factory>	factories;
+	MiniScene<GameState> scene;
+	Stopwatch	timer;
+	Array<Font>	fontAssets;
 
 	Game();
-	void	update();
+	Font&	font(int _size);
 	void	updateFactory(Factory* _f);
 	void	drawFactory(Factory* _f);
 };

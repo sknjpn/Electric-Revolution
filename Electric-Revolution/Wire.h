@@ -7,10 +7,12 @@ struct Wire
 	Node*	from;
 	Node*	to;
 	bool	broken;
+	Color	color;
 
-	Wire(Node* _from, Node* _to);
+	static Color	selectedColor;
 
-	void	draw();
+	Wire(Node* _from, Node* _to, const Color& _color);
+
 	bool	update();
 	Bezier3	line() const;
 };

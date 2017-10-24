@@ -2,24 +2,14 @@
 #include"Node.h"
 #include"Machine.h"
 
-Wire::Wire(Node* _from, Node* _to)
+Color	Wire::selectedColor = RandomHSV();
+
+Wire::Wire(Node* _from, Node* _to, const Color& _color)
 	: from(_from)
 	, to(_to)
 	, broken(false)
+	, color(_color)
 {}
-
-void	Wire::draw()
-{
-	Color color = Color(0, 0);
-	switch (from->state)
-	{
-	case NodeState::Hi: color = Palette::Red;	break;
-	case NodeState::Low: color = Palette::Blue;	break;
-	case NodeState::None: color = Palette::White;	break;
-	}
-	line().draw(0.125 + 0.0625, Palette::Black);
-	line().draw(0.125, color);
-}
 
 bool	Wire::update()
 {

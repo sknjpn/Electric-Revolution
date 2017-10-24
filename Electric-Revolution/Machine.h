@@ -2,9 +2,21 @@
 #include"Node.h"
 struct Game;
 struct Factory;
+struct Blueprint;
+
+struct Group
+{
+	String	name;
+	Array<Blueprint*>	blueprints;
+	
+	Group(const String& _name)
+		: name(_name)
+	{}
+};
 
 struct Blueprint
 {
+	Group*	group;
 	Size	size;
 	String	name;
 	FilePath	mainFile;
@@ -18,6 +30,8 @@ struct Blueprint
 struct Machine
 {
 	int	angle;
+	bool	isVirtual;
+	Size	baseSize;
 	Point	pos;
 	Factory*	factory;
 	sol::state	lua;
@@ -28,9 +42,10 @@ struct Machine
 	static int	newMachineAngle;
 	static Rect	newMachineRegion;
 	static Machine*	selectedMachine;
+	static Array<Group>	groups;
 	static Array<Blueprint>	blueprints;
 
-	Machine(int _type, Point _pos, Factory*	_factory);
+	Machine(Blueprint* _blueprint, Factory* _factory);
 	void	initLua();
 	void	draw();
 	void	updateSystem();
