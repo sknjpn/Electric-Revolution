@@ -175,25 +175,31 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="drawFactory.cpp" />
-    <ClCompile Include="Machine.initLua.cpp" />
+    <ClCompile Include="Blueprint.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Factory.cpp" />
     <ClCompile Include="Game.cpp" />
+    <ClCompile Include="Gearbox.cpp" />
     <ClCompile Include="Item.cpp" />
     <ClCompile Include="Machine.cpp" />
+    <ClCompile Include="MachineInitLua.cpp" />
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="Map.cpp" />
+    <ClCompile Include="Music.cpp" />
     <ClCompile Include="Node.cpp" />
-    <ClCompile Include="Scuttle.cpp" />
+    <ClCompile Include="Planet.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Tile.cpp" />
     <ClCompile Include="UI.cpp" />
     <ClCompile Include="updateFactory.cpp" />
+    <ClCompile Include="updateFactoryView.cpp" />
+    <ClCompile Include="updateMapView.cpp" />
+    <ClCompile Include="updateTitle.cpp" />
+    <ClCompile Include="Urban.cpp" />
     <ClCompile Include="Wire.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -214,6 +220,7 @@
     <Text Include="engine\font\noto\LICENSE_OFL.txt" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\README.md" />
     <None Include="dll_x64\d3d\d3dcompiler_47.dll" />
     <None Include="dll_x64\tobii\tobii_stream_engine.dll" />
     <None Include="dll_x86\d3d\d3dcompiler_47.dll" />
@@ -238,16 +245,21 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Blueprint.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Factory.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="Gearbox.h" />
     <ClInclude Include="Item.h" />
     <ClInclude Include="Machine.h" />
-    <ClInclude Include="Map.h" />
+    <ClInclude Include="Music.h" />
     <ClInclude Include="Node.h" />
-    <ClInclude Include="Scuttle.h" />
+    <ClInclude Include="Planet.h" />
+    <ClInclude Include="sol.hpp" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="Tile.h" />
     <ClInclude Include="UI.h" />
+    <ClInclude Include="Urban.h" />
     <ClInclude Include="Wire.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

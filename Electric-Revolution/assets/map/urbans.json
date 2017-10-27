@@ -1,50 +1,110 @@
 [
     {
         "name": "函館",
-        "pos": "(416,636)"
+        "pos": "(416,636)",
+        "factory": {
+            "name": "函館工場",
+            "size": "(128,128)",
+            "tileData": "factoryType0.png"
+        }
     },
     {
         "name": "小樽",
-        "pos": "(448,408)"
+        "pos": "(448,408)",
+        "factory": {
+            "name": "小樽工場",
+            "size": "(128,128)",
+            "tileData": "factoryType0.png"
+        }
     },
     {
         "name": "札幌",
-        "pos": "(491,428)"
+        "pos": "(491,428)",
+        "factory": {
+            "name": "札幌工場",
+            "size": "(128,128)",
+            "tileData": "factoryType1.png"
+        }
     },
     {
         "name": "千歳",
-        "pos": "(527,467)"
+        "pos": "(527,467)",
+        "factory": {
+            "name": "千歳工場",
+            "size": "(128,128)",
+            "tileData": "factoryType0.png"
+        }
     },
     {
         "name": "苫小牧",
-        "pos": "(512,498)"
+        "pos": "(512,498)",
+        "factory": {
+            "name": "苫小牧工場",
+            "size": "(128,128)",
+            "tileData": "factoryType0.png"
+        }
     },
     {
         "name": "留萌",
-        "pos": "(525,283)"
+        "pos": "(525,283)",
+        "factory": {
+            "name": "留萌工場",
+            "size": "(128,128)",
+            "tileData": "factoryType0.png"
+        }
     },
     {
         "name": "稚内",
-        "pos": "(529,36)"
+        "pos": "(529,36)",
+        "factory": {
+            "name": "稚内工場",
+            "size": "(128,128)",
+            "tileData": "factoryType0.png"
+        }
     },
     {
         "name": "旭川",
-        "pos": "(612,312)"
+        "pos": "(612,312)",
+        "factory": {
+            "name": "旭川工場",
+            "size": "(128,128)",
+            "tileData": "factoryType0.png"
+        }
     },
     {
         "name": "帯広",
-        "pos": "(711,450)"
+        "pos": "(711,450)",
+        "factory": {
+            "name": "帯広工場",
+            "size": "(128,128)",
+            "tileData": "factoryType0.png"
+        }
     },
     {
         "name": "釧路",
-        "pos": "(852,411)"
+        "pos": "(852,411)",
+        "factory": {
+            "name": "釧路工場",
+            "size": "(128,128)",
+            "tileData": "factoryType0.png"
+        }
     },
     {
         "name": "根室",
-        "pos": "(995,384)"
+        "pos": "(995,384)",
+        "factory": {
+            "name": "根室工場",
+            "size": "(128,128)",
+            "tileData": "factoryType0.png"
+        }
     },
     {
         "name": "網走",
-        "pos": "(839,270)"
+        "pos": "(839,270)",
+        "factory": {
+            "name": "網走工場",
+            "size": "(128,128)",
+            "tileData": "factoryType0.png"
+        }
     }
 ]

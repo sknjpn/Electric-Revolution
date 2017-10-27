@@ -1,89 +1,143 @@
 #include"UI.h"
-#include"Game.h"
+#include"Blueprint.h"
+#include"Factory.h"
 
-UI::UI(Game* _game)
-	: uiMode(UIMode::None)
-	, uiTexture(L"assets/ui.png")
-	, game(_game)
-	, selectedGroup(nullptr)
-	, trashAreaMouseOver(false)
-	, trashBox(L"assets/trashBox.png")
+Forklift::Forklift(Factory* _factory)
+	: enabled(false)
+	, type(0)
+	, angle(0)
+	, region(0, 0, 0, 0)
+	, selectedMachine(nullptr)
+	, factory(_factory)
+	, baseSize(0, 0)
 {}
 
-void	UI::update()
+void	Forklift::update()
 {
-	trashAreaMouseOver = false;
+	if (!enabled) return;
 
-	auto* g = game;
-	auto* f = game->mainFactory;
+	if (KeyR.down())
 	{
-		Rect(480, 48).draw(Color(80)).drawFrame(4, Color(60));
-		g->font(32)(f->name).draw(2, 2, Color(240));
+		angle = (angle + 1) % 4;
+		region.set(region.pos, region.h, region.w);
 	}
-	{
-		Rect(0, 48, 240, 32).draw(Color(80)).drawFrame(4, Color(60));
-		for (int i = 0; i < 3; i++)
-		{
-			Rect rect(16 + i * 48, 48, 32, 32);
-			if (int(uiMode) - 1 == i || Rect(16 + i * 48, 48, 32, 32).mouseOver())
-			{
-				uiTexture(32 * i, 32, 32, 32).draw(rect.pos);
 
-				if (rect.leftClicked())
+	if (MouseL.up())
+	{
+		if (canPutMachine())
+		{
+			Machine* nm = selectedMachine;
+			if (selectedMachine != nullptr)
+			{
+				auto* sm = selectedMachine;
+
+				//Tile‚©‚çíœ
+				for (auto p : step(sm->pos, sm->region().size))
 				{
-					if (int(uiMode) - 1 == i) uiMode = UIMode::None;
-					else uiMode = UIMode(i + 1);
+					factory->tiles[p.y][p.x].machine = nullptr;
+					factory->tiles[p.y][p.x].gearbox = nullptr;
 				}
-			}
-			else uiTexture(32 * i, 0, 32, 32).draw(rect.pos);
-		}
-	}
-	switch (uiMode)
-	{
-	case UIMode::None:
-		break;
-	case UIMode::EditMachineMode:
 
-		if (selectedGroup == nullptr) selectedGroup = &Machine::groups.front();
-		for (int i = 0; i < int(Machine::groups.size()); i++)
-		{
-			auto& gr = Machine::groups[i];
-			Rect rect1(0, 96 + i * 32, 240, 24);
-			rect1.draw(rect1.mouseOver() ? Color(160) : &gr == selectedGroup ? Color(120) : Color(80)).drawFrame(2, Color(60));
-			g->font(16)(gr.name).draw(rect1.pos.movedBy(0, 0));
-			if (rect1.leftClicked()) selectedGroup = &gr;
-			if (&gr == selectedGroup)
-			{
-				for (int j = 0; j < int(gr.blueprints.size()); j++)
+				//Gearbox‚ÌŠO•”‚Æ‚ÌÚ‘±‚ð‰ðœ
+				for (auto& m : factory->machines)
 				{
-					auto& b = gr.blueprints[j];
-
-					Rect rect2(256, 96 + i * 32 + j * 32, 240, 24);
-					rect2.draw(rect2.mouseOver() ? Color(160) : Color(80)).drawFrame(2, Color(60));
-					g->font(16)(b->name).draw(rect2.pos.movedBy(0, 0));
-					if (rect2.leftClicked())
+					if (&m != sm)
 					{
-						auto& m = g->mainFactory->machines.emplace_back(b, g->mainFactory);
-						Machine::selectedMachine = &m;
-						Machine::newMachineAngle = m.angle;
-						Machine::newMachineRegion = m.region();
+						for (auto& g : m.gearboxes)
+						{
+							g.connectedGearbox.remove_if([sm](const Gearbox* g) {
+								return g->machine == sm;
+							});
+						}
+					}
+				}
+				for (auto& g : sm->gearboxes)
+				{
+					g.connectedGearbox.remove_if([sm](const Gearbox* g) {
+						return g->machine != sm;
+					});
+				}
+
+				sm->angle = angle;
+				sm->pos = region.pos;
+				for (auto p : step(sm->pos, sm->region().size)) factory->tiles[p.y][p.x].machine = sm;
+			}
+			else
+			{
+				nm = factory->newMachine();
+				nm->set(blueprint, region.pos, angle);
+			}
+			for (auto& g : nm->gearboxes)
+			{
+				factory->tiles.at(g.pos()).gearbox = &g;
+				for (auto p : step(Point(-1, -1) + g.pos(), Size(3, 3)))
+				{
+
+					if ((p - g.pos()).length() == 1 &&
+						p.x >= 0 && p.y >= 0 &&
+						p.x < factory->size.x && p.y < factory->size.y &&
+						factory->tiles.at(p).gearbox != nullptr)
+					{
+						auto* cg = factory->tiles.at(p).gearbox;
+
+						cg->connectedGearbox.emplace_back(&g);
+						g.connectedGearbox.emplace_back(cg);
 					}
 				}
 			}
 		}
-
-		if (Machine::selectedMachine != nullptr)
-		{
-			if (trashArea.mouseOver()) trashAreaMouseOver = true;
-			trashArea = Rect(Window::Size().x - 128, 32, 96, 96);
-			trashBox(64 * trashArea.mouseOver(), 0, 64, 64).resize(trashArea.size).draw(trashArea.pos);
-		}
-
-		break;
-	case UIMode::EditWireMode:
-
-		break;
-	default:
-		break;
+		enabled = false;
+		return;
 	}
+
+	region = RectF(region).setCenter(Cursor::PosF().movedBy(0.5, 0.5));
+	baseTexture.resize(baseSize).rotate(angle * 90_deg).drawAt(region.pos + region.size / 2.0, Color(Palette::White, 128));
+
+	if (canPutMachine()) region.draw(Color(Palette::Orange, 128)).drawFrame(1 / 16.0, Palette::Orange);
+	else region.draw(Color(Palette::Red, 128)).drawFrame(1 / 16.0, Palette::Red);
+
+}
+void	Forklift::set(Machine* _sm)
+{
+	blueprint = _sm->blueprint;
+	type = blueprint->type;
+	angle = _sm->angle;
+	enabled = true;
+	baseSize = _sm->baseSize;
+	region.set(_sm->region());
+	baseTexture = _sm->baseTexture;
+	selectedMachine = _sm;
+}
+void	Forklift::set(Blueprint* _blueprint)
+{
+	blueprint = _blueprint;
+	type = blueprint->type;
+	angle = 0;
+	enabled = true;
+	baseSize = blueprint->baseSize();
+	region.set(Point(0, 0), baseSize);
+	baseTexture = blueprint->baseTexture();
+	selectedMachine = nullptr;
+}
+bool	Forklift::canPutMachine() const
+{
+	for (auto p : step(region.pos, region.size))
+	{
+		if (p.x < 0 || p.y < 0 || p.x >= factory->size.x || p.y >= factory->size.y ||
+			!factory->tiles[p.y][p.x].canPutMachine ||
+			(factory->tiles[p.y][p.x].machine != nullptr && factory->tiles[p.y][p.x].machine != selectedMachine))
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
+UI::UI(Factory* _factory)
+	: uiMode(UIMode::None)
+	, uiTexture(L"assets/uiTexture.png")
+	, factory(_factory)
+	, selectedGroup(nullptr)
+{
+
 }

@@ -1,0 +1,37 @@
+[
+    {
+        "name": "lawn",
+        "type": 0,
+        "color": "(34,177,76)",
+        "canPutMachine": false,
+        "isTradeTile": false
+    },
+    {
+        "name": "wall",
+        "type": 1,
+        "color": "(0,0,0)",
+        "canPutMachine": false,
+        "isTradeTile": false
+    },
+    {
+        "name": "floor",
+        "type": 2,
+        "color": "(195,195,195)",
+        "canPutMachine": true,
+        "isTradeTile": false
+    },
+    {
+        "name": "door",
+        "type": 3,
+        "color": "(255,127,39)",
+        "canPutMachine": false,
+        "isTradeTile": true
+    },
+    {
+        "name": "rail",
+        "type": 4,
+        "color": "(185,122,87)",
+        "canPutMachine": false,
+        "isTradeTile": false
+    }
+]

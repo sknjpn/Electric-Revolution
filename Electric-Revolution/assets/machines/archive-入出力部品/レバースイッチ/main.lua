@@ -1,3 +1,9 @@
+machine = {
+	name = "レバースイッチ",
+	size = {x = 2, y = 1},
+	group = "入出力部品"
+}
+
 lever = "right"
 
 function init()

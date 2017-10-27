@@ -1,3 +1,9 @@
+machine = {
+	name = "ゴミ箱",
+	size = {x = 4, y = 3},
+	group = "汎用マシン"
+}
+
 energy = 0
 i = 0
 j = 1

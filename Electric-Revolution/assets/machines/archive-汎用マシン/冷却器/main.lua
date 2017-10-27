@@ -1,3 +1,9 @@
+machine = {
+	name = "冷却器",
+	size = {x = 4, y = 1},
+	group = "汎用マシン"
+}
+
 ir = 0
 jr = 1
 il = 0

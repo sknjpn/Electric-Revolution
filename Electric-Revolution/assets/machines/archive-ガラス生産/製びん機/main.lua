@@ -1,12 +1,23 @@
+machine = {
+	name = "製びん機",
+	size = {x = 4, y = 1},
+	group = "ガラス製造"
+}
+
 ir = 0
 jr = 1
 il = 0
 jl = 1
 progress = 0
+
+function init()
+    setGearbox(1, 0, 100)
+end
+
 function updateSystem()
 
     --Progress
-    if progress > 0 and getKineticEnergy(1, 0) > 50 then
+    if progress > 0 and getGearboxGain(0) > 40 then
         if progress == 1 then playAudio("sound.mp3") end
         progress = progress + 1
         if progress == 120 then
@@ -52,7 +63,7 @@ end
 function draw()
     drawTexture("image.png")
 
-    if getKineticEnergy(1, 0) > 50 then
+    if getGearboxGain(0) > 40 then
         drawTexture("progress.png")
     end
 

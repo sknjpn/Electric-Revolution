@@ -2,17 +2,15 @@
 
 struct Node;
 
+//M†ü
 struct Wire
 {
-	Node*	from;
-	Node*	to;
-	bool	broken;
+	Node*	n0;
+	Node*	n1;
 	Color	color;
 
-	static Color	selectedColor;
 
-	Wire(Node* _from, Node* _to, const Color& _color);
+	Wire(Node* _n0, Node* _n1, const Color& _color);
 
-	bool	update();
-	Bezier3	line() const;
+	Bezier3	getBezier3() const;
 };

@@ -1,59 +1,36 @@
 #pragma once
+
 #include"Node.h"
-struct Game;
-struct Factory;
+#include"Gearbox.h"
+
 struct Blueprint;
+struct Factory;
 
-struct Group
-{
-	String	name;
-	Array<Blueprint*>	blueprints;
-	
-	Group(const String& _name)
-		: name(_name)
-	{}
-};
-
-struct Blueprint
-{
-	Group*	group;
-	Size	size;
-	String	name;
-	FilePath	mainFile;
-	Array<std::pair<FilePath, Texture>>	textureAssets;
-
-	Blueprint(const FilePath& _mainFile);
-
-	Texture*	texture(const String& _name);
-};
-
+//機械
 struct Machine
 {
+	int	type;
 	int	angle;
-	bool	isVirtual;
+	bool	enabled;
 	Size	baseSize;
 	Point	pos;
+	Texture	baseTexture;	//一時的な表示用
+	FilePath	mainPath;
 	Factory*	factory;
-	sol::state	lua;
 	Blueprint*	blueprint;
+	sol::state	lua;
 	Array<Node>	nodes;
+	Array<Gearbox>	gearboxes;
 	Array<std::pair<FilePath, Audio>>	audioAssets;
+	Array<std::pair<FilePath, Texture>>	textureAssets;
 
-	static int	newMachineAngle;
-	static Rect	newMachineRegion;
-	static Machine*	selectedMachine;
-	static Array<Group>	groups;
-	static Array<Blueprint>	blueprints;
+	Machine(Factory* _factory);
 
-	Machine(Blueprint* _blueprint, Factory* _factory);
+	void	set(Blueprint* _blueprint, const Point& _pos, int _angle);
 	void	initLua();
-	void	draw();
-	void	updateSystem();
-	bool	updateConnects();
-	Rect	region() const;
-	Size	size() const;
-	Point	transformedPos(const Point& _pos) const;
-	Vec2	transformedPos(const Vec2& _pos) const;
-	Size	factorySize() const;
+	Rect	region() const;	//実座標上
+	Audio	audio(const FilePath& _path);
+	Texture	texture(const FilePath& _path);
+	Point	transformInMachinePos(const Point& _pos) const;
+	Vec2	transformInMachinePos(const Vec2& _pos) const;
 };
-

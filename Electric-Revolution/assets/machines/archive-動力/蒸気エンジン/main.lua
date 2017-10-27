@@ -1,16 +1,24 @@
+machine = {
+	name = "蒸気エンジン",
+	size = {x = 6, y = 1},
+	group = "動力源"
+}
+
 i = 0
 j = 1
 
 function init()
     setNode(0.5, 1.0, 0.0, 1.0)
+    setGearbox(4, 0, 10.0)
 end
 
 function updateSystem()
     if getNodeState(0) == 2 then
-        clearKineticEnergy(4, 1)
-        addKineticEnergy(100.0, 4, 1)
+        addGearboxPressure(0, 20.0)
+        --clearKineticEnergy(4, 1)
+        --addKineticEnergy(100.0, 4, 1)
         i = i + 1
-        if i == 1 then
+        if i == 2 then
             i = 0
             j = j + 1
             if j == 6 then

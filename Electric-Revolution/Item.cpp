@@ -1,92 +1,92 @@
 #include"Item.h"
 #include"Factory.h"
-Array<Texture>	Item::textureAssets;
 
-void	Item::addItem(Factory* _factory, const Point& _pos, int _id)
-{
-	for (auto& i : _factory->items)
-	{
-		if (!i.enabled)
-		{
-			i.enabled = true;
-			i.p = _pos;
-			i.id = _id;
-			i.angle = 0;
-			i.t = 0.0;
-			i.factory = _factory;
-			_factory->itemMap.at(i.p) = &i;
-			return;
-		}
-	}
-}
-Item::Item()
-	: p()
-	, t(0.0)
-	, factory(nullptr)
-	, id(0)
+Item::Item(Factory* _factory, int _id, const Point& _p, int _layer)
+	: id(_id)
+	, p(_p)
 	, angle(0)
-	, enabled(false)
-{}
+	, t(0.0)
+	, enabled(true)
+	, factory(_factory)
+	, layer(_layer)
+{
+	texture = factory->texture(L"assets/items/" + Format(_id) + L".png");
+	factory->tiles[p.y][p.x].items[layer] = this;
+}
+void	Item::set(const Point& _p, int _id, int _layer)
+{
+	id = _id;
+	p = _p;
+	angle = 0;
+	t = 0.0;
+	texture = Texture(L"assets/items/" + Format(_id) + L".png");
+	enabled = true;
+	layer = _layer;
+
+	factory->tiles[p.y][p.x].items[layer] = this;
+}
 Vec2	Item::pos() const
 {
-	if (angle == 0) return p + Vec2::Right()*t;
-	if (angle == 1) return p + Vec2::Down()*t;
-	if (angle == 2) return p + Vec2::Left()*t;
-	return p + Vec2::Up()*t;
+	Vec2 toPos = (angle == 0) ? p.movedBy(1, 0) : (angle == 1) ? p.movedBy(0, 1) : (angle == 2) ? p.movedBy(-1, 0) : p.movedBy(0, -1);
+	return Vec2(p).lerp(toPos, t);
 }
-void	Item::draw()
-{
-	if (!enabled) return;
-	textureAssets[id].resize(1, 1).draw(pos());
-}
-void	Item::erase()
+void	Item::remove()
 {
 	enabled = false;
-	if (t > 0)
+	factory->getTile(p)->items[layer] = nullptr;
+	if (t != 0)
 	{
-		const auto& tot = angle == 0 ? p.movedBy(1, 0) : angle == 1 ? p.movedBy(0, 1) : angle == 2 ? p.movedBy(-1, 0) : p.movedBy(0, -1);
-		factory->itemMap.at(tot) = nullptr;
+		auto toPos = (angle == 0) ? p.movedBy(1, 0) : (angle == 1) ? p.movedBy(0, 1) : (angle == 2) ? p.movedBy(-1, 0) : p.movedBy(0, -1);
+		factory->getTile(toPos)->items[layer] = nullptr;
 	}
-	factory->itemMap.at(p) = nullptr;
 }
-void	Item::move(int _angle, double _t)
+void	Item::move(Point _p, int _angle, double _t)
 {
-	const auto& tom = _angle == 0 ? p.movedBy(1, 0) : _angle == 1 ? p.movedBy(0, 1) : _angle == 2 ? p.movedBy(-1, 0) : p.movedBy(0, -1);
-	const auto& tot = angle == 0 ? p.movedBy(1, 0) : angle == 1 ? p.movedBy(0, 1) : angle == 2 ? p.movedBy(-1, 0) : p.movedBy(0, -1);
+	auto fromPos = (angle == 0) ? p.movedBy(1, 0) : (angle == 1) ? p.movedBy(0, 1) : (angle == 2) ? p.movedBy(-1, 0) : p.movedBy(0, -1);
+	auto toPos = (_angle == 0) ? p.movedBy(1, 0) : (_angle == 1) ? p.movedBy(0, 1) : (_angle == 2) ? p.movedBy(-1, 0) : p.movedBy(0, -1);
 
-	if (!factory->canMoveItemTo(tom, id)) return;
-
-	if (t == 0)
+	if (p == _p)	//“¯‚¶À•W‚É‚©‚©‚é—Í‚Ìê‡
 	{
-		if (factory->itemMap.at(tom) == nullptr)
+		if (angle == _angle || t == 0)
 		{
-			factory->itemMap.at(tom) = this;
-			t = _t;
+			if (!factory->canPutItemAt(toPos, id, layer)) return;
 			angle = _angle;
+
+			if (factory->getTile(toPos) == nullptr || (factory->getTile(toPos)->items[layer] != nullptr && factory->getTile(toPos)->items[layer] != this))
+			{
+				return;	//“®‚©‚¹‚È‚¢
+			}
+			else
+			{
+				factory->getTile(toPos)->items[layer] = this;
+				t += _t*(1.0 - (pos() - Vec2(_p)).length());
+				if (t >= 1.0)
+				{
+					factory->getTile(p)->items[layer] = nullptr;
+					t = 0.0;
+					p = toPos;
+				}
+			}
+		}
+		else
+		{
+			t -= _t*(1.0 - (pos() - Vec2(_p)).length());
+			if (t <= 0)
+			{
+				angle = _angle;
+				t = -t;
+				factory->getTile(fromPos)->items[layer] = nullptr;
+			}
 		}
 	}
-	else
+	else	//sæ‚ÌÀ•W‚É‚©‚©‚é—Í‚Ìê‡
 	{
-		if (angle == _angle)
+		t += _t*(1.0 - (pos() - Vec2(_p)).length());
+		if (t >= 1.0)
 		{
-			t += _t;
-			if (t >= 1.0)
-			{
-				t = 0.0;
-
-				factory->itemMap.at(p) = nullptr;
-				p = tom;
-			}
-		}
-		else if (angle % 2 == _angle % 2)
-		{
-			t -= _t;
-			if (t <= 0.0)
-			{
-				t = 0.0;
-
-				factory->itemMap.at(tot) = nullptr;
-			}
+			factory->getTile(p)->items[layer] = nullptr;
+			t = 0.0;
+			p = _p;
 		}
 	}
 }

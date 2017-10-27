@@ -1,144 +1,103 @@
 #include"Game.h"
-#include"Factory.h"
 
 Game::Game()
-	: mainFactory(nullptr)
-	, camera()
-	, ui(this)
+	: sceneState(SceneState::Title)
+	, planet(this)
 {
-	Window::Resize(1280, 720);
-	//Graphics::SetFullScreen(true, Graphics::EnumOutputs().front().displayModes.back().size);
-	Window::SetTitle(L"Electric Revolution");
-	Graphics::SetBackground(Palette::Skyblue);
-
-	auto dc = FileSystem::DirectoryContents(L"assets/machines/");
-	Machine::blueprints.reserve(dc.size());
-	Machine::groups.reserve(dc.size());
-	for (auto c : dc)
+	//ブループリントの設定
 	{
-		if (c.includes(L"config.ini"))
-		{
-			auto& b = Machine::blueprints.emplace_back(c.removed(L"config.ini"));
+		auto dc = FileSystem::DirectoryContents(L"assets/machines");
 
-			INIReader ini(c);
-			for (auto& g : Machine::groups)
+		//ブループリント数の計算
+		int numBlueprint = 0;
+		for (auto c : dc)
+		{
+			if (c.includes(L"main.lua")) numBlueprint++;
+		}
+
+		//ブループリントのメモリ領域予約
+		blueprints.reserve(numBlueprint);
+
+		//ブループリントの読み込み
+		for (auto c : dc)
+		{
+			if (c.includes(L"main.lua"))
 			{
-				if (g.name == ini.get<String>(L"Base.group"))
-				{
-					g.blueprints.emplace_back(&b);
-					b.group = &g;
-					break;
-				}
+				sol::state lua;
+				lua.script_file(CharacterSet::Narrow(c));
+				auto name = CharacterSet::FromUTF8(lua["machine"]["name"].get<std::string>());
+				auto group = CharacterSet::FromUTF8(lua["machine"]["group"].get<std::string>());
+				blueprints.emplace_back(int(blueprints.size()), name, c.removed(L"main.lua"));
+				if (!groups.any([&group](const Group& g) { return group == g.name; })) groups.emplace_back(group);
+
+				//デバッグ用
+				Output << group << L", " << name;
 			}
-			if (b.group == nullptr)
+		}
+
+		//グループへの登録
+		for (auto& g : groups)
+		{
+			for (auto& b : blueprints)
 			{
-				b.group = &Machine::groups.emplace_back(ini.get<String>(L"Base.group"));
-				b.group->blueprints.emplace_back(&b);
+				sol::state lua;
+				lua.script_file(CharacterSet::Narrow(b.mainPath + L"main.lua"));
+				auto group = CharacterSet::FromUTF8(lua["machine"]["group"].get<std::string>());
+				if (g.name == group) g.blueprints.emplace_back(&b);
 			}
 		}
 	}
-	for (auto c : FileSystem::DirectoryContents(L"assets/items/")) Item::textureAssets.emplace_back(c);
 
-	for (auto& b : Machine::blueprints) Output << b.group->name << b.name;
+	//システム設定
+	Graphics::SetBackground(Palette::Skyblue);
+	Window::Resize(1280, 720);
+	Window::SetTitle(L"Electric Revolution");
+	//System::SetExitEvent(WindowEvent::CloseButton);
+	while (!MouseL.down() && System::Update());
+	music.setMusic(L"assets/music/星くずの行進.mp3");
 
-	timer.start();
-	bgm = Audio(L"assets/bgm/星くずの行進.mp3");
-	bgm.setLoop(true);
-	bgm.play();
-
-	scene[GameState::Title] = [this]()
+	//メインループ
+	while (System::Update())
 	{
-		font(128)(L"Electric Revolution").drawAt(Window::ClientRect().center());
-
-		if (MouseL.down())
+		if (KeyF11.down())
 		{
-			bgm = Audio(L"assets/bgm/アーケード街.mp3");
-			bgm.setLoop(true);
-			bgm.play();
-			scene.changeState(GameState::MapView);
-
-			camera.restrictedRegion.set(Rect(1280, 720));
-			camera.drawingRegion.set(camera.restrictedRegion);
-			camera.smoothDrawingRegion.set(camera.drawingRegion);
-			camera.magnificationMax = 4.0;
-			camera.magnificationMin = 1.0;
+			if (Window::GetState().fullScreen) Graphics::SetFullScreen(false, Size(1280, 720));
+			else Graphics::SetFullScreen(true, Graphics::EnumOutputs().front().displayModes.back().size);
 		}
-	};
-	scene[GameState::MapView] = [this]()
-	{
-		camera.update();
-		auto t = camera.createTransformer2D();
 
-		ClearPrint();
-
-		map.texture.draw();
-
-		for (auto& u : map.urbans)
+		switch (sceneState)
 		{
-
-			if (Circle(u.pos, 6).mouseOver())
-			{
-				Circle(u.pos, 4).draw(Palette::Red).drawFrame(1, Palette::Black);
-
-				if (MouseL.down())
-				{
-					scene.changeState(GameState::FactoryView);
-					ui.uiMode = UIMode::None;
-
-					mainFactory = &u.factory;
-					mainFactory->isMain = true;
-
-					int ow = 30;	//芝生の長さ
-					camera.restrictedRegion.set(Size(-ow, -ow), mainFactory->size + Size(ow * 2, ow * 2));
-					camera.drawingRegion.set(RectF(Window::ClientRect()).scaledAt(Vec2::Zero(), 0.05).setCenter(mainFactory->size / 2));
-					camera.smoothDrawingRegion.set(camera.drawingRegion);
-					camera.magnificationMax = 64.0;
-					camera.magnificationMin = 16.0;
-				}
-			}
-			else
-			{
-				Circle(u.pos, 4).draw(Palette::White).drawFrame(1, Palette::Black);
-			}
-			font(16)(u.name).drawAt(u.pos.movedBy(0, -12), Palette::Black);
+		case SceneState::Title:
+			updateTitle();
+			break;
+		case SceneState::MapView:
+			updateMapView();
+			break;
+		case SceneState::FactoryView:
+			updateFactoryView();
+			break;
 		}
-	};
-	scene[GameState::FactoryView] = [this]()
-	{
-		ClearPrint();
-
-		//カメラ処理
-		camera.update();
-
-		for (auto& u : map.urbans)
-		{
-			updateFactory(&u.factory);
-		}
-		drawFactory(mainFactory);
-
-		ui.update();
-
-		if (ui.uiMode == UIMode::ReturnToMap)
-		{
-			mainFactory->isMain = false;
-			mainFactory = nullptr;
-			Machine::selectedMachine = nullptr;
-			scene.changeState(GameState::MapView);
-
-			camera.restrictedRegion.set(Rect(1280, 720));
-			camera.drawingRegion.set(camera.restrictedRegion);
-			camera.smoothDrawingRegion.set(camera.drawingRegion);
-			camera.magnificationMax = 4.0;
-			camera.magnificationMin = 1.0;
-		}
-	
-	};
+	}
 }
 Font&	Game::font(int _size)
 {
-	for (; int(fontAssets.size()) <= _size;)
+	while (_size > int(fontAssets.size()))
 	{
-		fontAssets.emplace_back(int(fontAssets.size()) + 1);
+		fontAssets.emplace_back(int(fontAssets.size() + 1));
 	}
-	return fontAssets[_size];
+
+	return fontAssets[_size - 1];
+}
+Texture	Game::texture(const FilePath& _path)
+{
+	for (auto& ta : textureAssets)
+	{
+		if (ta.first == _path) return ta.second;
+	}
+
+	return textureAssets.emplace_back(_path, _path).second;
+}
+Texture	Factory::texture(const FilePath& _path)
+{
+	return urban->planet->game->texture(_path);
 }

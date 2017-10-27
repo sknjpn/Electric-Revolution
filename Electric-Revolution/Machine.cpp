@@ -1,93 +1,58 @@
 #include"Machine.h"
+#include"Blueprint.h"
 #include"Factory.h"
 
-Blueprint::Blueprint(const FilePath& _mainFile)
-	: mainFile(_mainFile)
-	, group(nullptr)
-{
-	INIReader	ini(_mainFile + L"config.ini");
-	name = ini.get<String>(L"Base.name");
-	size = ini.get<Size>(L"Base.size");
-
-	auto dc = FileSystem::DirectoryContents(mainFile);
-	for (auto& c : dc)
-	{
-		if (FileSystem::IsFile(c))
-		{
-			if (FileSystem::Extension(c) == L"png")
-			{
-				textureAssets.emplace_back(c.removed(mainFile), Texture(c));
-			}
-		}
-	}
-}
-
-Texture*	Blueprint::texture(const String& _name)
-{
-	for (auto& ta : textureAssets)
-	{
-		if (ta.first == _name) return &ta.second;
-	}
-	return nullptr;
-}
-Machine::Machine(Blueprint* _blueprint, Factory* _factory)
-	: blueprint(_blueprint)
+Machine::Machine(Factory* _factory)
+	: enabled(false)
 	, factory(_factory)
-	, pos(-1000, -1000)
-	, angle(0)
-	, isVirtual(true)
 {
-	baseSize = blueprint->size;
+
+}
+void	Machine::set(Blueprint* _blueprint, const Point& _pos, int _angle)
+{
+	enabled = true;
+	blueprint = _blueprint;
+	type = blueprint->type;
+	baseSize = blueprint->baseSize();
+	baseTexture = blueprint->baseTexture();
+	pos = _pos;
+	angle = _angle;
+	mainPath = blueprint->mainPath;
 	initLua();
-}
-void	Machine::draw()
-{
-	if (isVirtual) return;
-	if (lua["draw"].get_type() == sol::type::function) lua["draw"]();
+
+	//Tile‚É“o˜^
+	for (auto p : step(pos, region().size)) factory->tiles[p.y][p.x].machine = this;
 }
 
-void	Machine::updateSystem()
-{
-	if (isVirtual) return;
-	if (lua["updateSystem"].get_type() == sol::type::function) lua["updateSystem"]();
-
-}
-bool	Machine::updateConnects()
-{
-	if (isVirtual) return false;
-	if (lua["updateConnects"].get_type() == sol::type::function) lua["updateConnects"]();
-	return false;
-}
 Rect	Machine::region() const
 {
-	if (angle % 2 == 1) return Rect(pos, baseSize.y, baseSize.x);
-	return Rect(pos, baseSize.x, baseSize.y);
+	if (angle % 2 == 0) return { pos, baseSize };
+	else return { pos, baseSize.y, baseSize.x };
 }
-Size	Machine::size() const
+Audio	Machine::audio(const FilePath& _path)
 {
-	if (angle % 2 == 1) return Size(baseSize.y, baseSize.x);
-	return baseSize;
+	for (auto& aa : audioAssets)
+	{
+		if (aa.first == _path) return aa.second;
+	}
+
+	return audioAssets.emplace_back(_path, _path).second;
 }
-Point	Machine::transformedPos(const Point& _pos) const
+Texture	Machine::texture(const FilePath& _path)
+{
+	return factory->texture(_path);
+}
+Point	Machine::transformInMachinePos(const Point& _pos) const
 {
 	if (angle == 0) return Point(_pos.x, _pos.y);
 	if (angle == 1) return Point(baseSize.y - 1 - _pos.y, _pos.x);
 	if (angle == 2) return Point(baseSize.x - 1 - _pos.x, baseSize.y - 1 - _pos.y);
 	return Point(_pos.y, baseSize.x - 1 - _pos.x);
 }
-Vec2	Machine::transformedPos(const Vec2& _pos) const
+Vec2	Machine::transformInMachinePos(const Vec2& _pos) const
 {
 	if (angle == 0) return Vec2(_pos.x, _pos.y);
 	if (angle == 1) return Vec2(baseSize.y - _pos.y, _pos.x);
 	if (angle == 2) return Vec2(baseSize.x - _pos.x, baseSize.y - _pos.y);
 	return Vec2(_pos.y, baseSize.x - _pos.x);
 }
-Size	Machine::factorySize() const
-{
-	return factory->size;
-}
-int		Machine::newMachineAngle;
-Rect	Machine::newMachineRegion;
-Machine*	Machine::selectedMachine = nullptr;
-Array<Group>	Machine::groups;
-Array<Blueprint>	Machine::blueprints;

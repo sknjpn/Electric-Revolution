@@ -1,32 +1,36 @@
 #pragma once
-#include"Camera.h"
-#include"Factory.h"
-#include"UI.h"
-#include"Map.h"
-#include<HamFramework.hpp>
 
+#include"Planet.h"
+#include"Tile.h"
+#include"Music.h"
+#include"Blueprint.h"
 
-enum struct GameState {
+struct Factory;
+
+enum struct SceneState
+{
 	Title,
 	MapView,
 	FactoryView,
-	Tutorial,
 };
 
 struct Game
 {
-	UI	ui;
-	Map	map;
-	Audio	bgm;
-	Camera	camera;
-	Vec2	rightClickedPoint;
+	Music	music;
+	Planet	planet;
 	Factory*	mainFactory;
-	MiniScene<GameState> scene;
-	Stopwatch	timer;
+	SceneState	sceneState;
 	Array<Font>	fontAssets;
+	Array<Group>	groups;
+	Array<Blueprint>	blueprints;
+	Array<std::pair<FilePath, Texture>>	textureAssets;
 
 	Game();
-	Font&	font(int _size);
+
+	Font&	font(int _size);	//_size > 0
 	void	updateFactory(Factory* _f);
-	void	drawFactory(Factory* _f);
+	void	updateTitle();
+	void	updateMapView();
+	void	updateFactoryView();
+	Texture	texture(const FilePath& _path);
 };

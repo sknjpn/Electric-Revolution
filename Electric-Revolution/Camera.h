@@ -1,16 +1,19 @@
 #pragma once
 
+//Ž‹“_ˆÚ“®
 class Camera
 {
-public:
-	RectF	restrictedRegion;
-	RectF	drawingRegion;
+	RectF	targetDrawingRegion;
 	RectF	smoothDrawingRegion;
-	double	magnificationMax;
+	RectF	restrictedRegion;
 	double	magnificationMin;
+	double	magnificationMax;
 
-	Camera();
+public:
+	Camera(RectF __restrictedRegion, RectF _drawingRegion, double _mMax, double _mMin);
+	Camera(RectF __restrictedRegion, double _mMax, double _mMin);
 
 	void	update();
-	Transformer2D	createTransformer2D(double _magnification = 1.0) const;
+	RectF	getDrawingRegion() const;
+	Transformer2D	createTransformer() const;
 };

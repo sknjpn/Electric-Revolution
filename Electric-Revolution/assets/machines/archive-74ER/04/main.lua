@@ -1,3 +1,9 @@
+machine = {
+	name = "74ER04",
+	size = {x = 3, y = 2},
+	group = "汎用ロジックIC"
+}
+
 function init()
     --bottom left
     setNode(0.375, 1.75, 0.0,  0.5)    --0  1A

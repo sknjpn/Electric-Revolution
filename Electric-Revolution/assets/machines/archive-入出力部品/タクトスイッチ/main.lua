@@ -1,3 +1,9 @@
+machine = {
+	name = "タクトスイッチ",
+	size = {x = 1, y = 1},
+	group = "入出力部品"
+}
+
 pushed = false
 
 function init()

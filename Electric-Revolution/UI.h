@@ -1,6 +1,7 @@
 #pragma once
 
-struct Game;
+struct Machine;
+struct Factory;
 struct Group;
 struct Blueprint;
 
@@ -9,20 +10,36 @@ enum struct UIMode
 	None,
 	EditMachineMode,
 	EditWireMode,
-	ReturnToMap,
+	EditGearbox,
+	Exit,
+};
+
+struct Forklift
+{
+	int	type;
+	int angle;
+	bool	enabled;
+	Size	baseSize;
+	Rect	region;
+	Texture	baseTexture;
+	Machine*	selectedMachine;
+	Factory*	factory;
+	Blueprint*	blueprint;
+
+	Forklift(Factory* _factory);
+
+	void	update();
+	void	set(Machine* _sm);
+	void	set(Blueprint* _blueprint);
+	bool	canPutMachine() const;
 };
 
 struct UI
 {
-	bool	trashAreaMouseOver;
-	Game*	game;
+	Group*	selectedGroup;
 	UIMode	uiMode;
 	Texture	uiTexture;
-	Texture	trashBox;
-	Group*	selectedGroup;
-	Rect	trashArea;
+	Factory*	factory;
 
-	UI(Game* _game);
-
-	void	update();
+	UI(Factory* _factory);
 };

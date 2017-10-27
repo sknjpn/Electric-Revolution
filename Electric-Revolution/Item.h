@@ -1,24 +1,24 @@
 #pragma once
 
+struct Tile;
 struct Factory;
 
+//ƒAƒCƒeƒ€
 struct Item
 {
+	int	id;
+	int	layer;
+	int	angle;
 	bool	enabled;
-	int		id;
 	Point	p;
-	int		angle;
 	double	t;
-	Factory*	factory;
+	Texture	texture;
+	Factory* factory;
 
-	static Array<Texture>	textureAssets;
+	Item(Factory* _factory, int _id, const Point& _p, int _layer);
 
-	Item();
-
+	void	move(Point _p, int _angle, double _t);
+	void	set(const Point& _p, int _id, int _layer);
+	void	remove();
 	Vec2	pos() const;
-	void	draw();
-	void	move(int _angle, double _t);
-	void	erase();
-
-	static void	addItem(Factory* _factory, const Point& _pos, int _id);
 };

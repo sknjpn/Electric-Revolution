@@ -2,34 +2,17 @@
 #include"Node.h"
 #include"Machine.h"
 
-Color	Wire::selectedColor = RandomHSV();
-
-Wire::Wire(Node* _from, Node* _to, const Color& _color)
-	: from(_from)
-	, to(_to)
-	, broken(false)
+Wire::Wire(Node* _n0, Node* _n1, const Color& _color)
+	: n0(_n0)
+	, n1(_n1)
 	, color(_color)
 {}
 
-bool	Wire::update()
+Bezier3	Wire::getBezier3() const
 {
-	if (broken) return false;
-	if (from->state == to->state) return false;
-	if (from->state != NodeState::None && to->state != NodeState::None)
-	{
-		broken = true;
-		return true;
-	}
-	if (from->state == NodeState::None) from->state = to->state;
-	else to->state = from->state;
-	return true;
-}
-Bezier3	Wire::line() const
-{
-	const auto& p0 = from->pos();
-	const auto& p1 = from->pos() + from->dv.rotated(from->parentMachine->angle * 90_deg);
-	const auto& p2 = to->pos() + to->dv.rotated(to->parentMachine->angle * 90_deg);
-	const auto& p3 = to->pos();
-
+	Vec2 p0 = n0->pos();
+	Vec2 p1 = n0->machine->pos + n0->machine->transformInMachinePos(n0->inMachinePos + n0->deltaVector);
+	Vec2 p2 = n1->machine->pos + n1->machine->transformInMachinePos(n1->inMachinePos + n1->deltaVector);
+	Vec2 p3 = n1->pos();
 	return Bezier3(p0, p1, p2, p3);
 }

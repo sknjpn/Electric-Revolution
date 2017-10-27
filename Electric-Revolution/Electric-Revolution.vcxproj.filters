@@ -84,11 +84,23 @@
     <Filter Include="Assets">
       <UniqueIdentifier>{062fc55d-0112-4bec-9c63-132ccab07536}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Main\Map">
-      <UniqueIdentifier>{34bf7d7f-2e25-4522-8786-6cdf23d8c133}</UniqueIdentifier>
+    <Filter Include="Main\Gearbox">
+      <UniqueIdentifier>{7cf77229-8ac6-47d8-b293-ec160ed59f22}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Main\Scuttle">
-      <UniqueIdentifier>{0e5c9234-3f57-48e4-81a2-9643e4202a4c}</UniqueIdentifier>
+    <Filter Include="Main\Blueprint">
+      <UniqueIdentifier>{b0c54587-70ec-47ba-8d06-c4444b3b98ae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Main\Music">
+      <UniqueIdentifier>{a071630b-318f-43be-8b10-64141148176f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Main\Planet">
+      <UniqueIdentifier>{a1e2d83f-eaa1-4441-8c2c-cbc75f4c3ff5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Main\Tile">
+      <UniqueIdentifier>{471dc029-dfe5-4612-b737-19a403783808}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Main\Urban">
+      <UniqueIdentifier>{d75d5ec4-05bf-444f-a9e3-ac2094ca7e57}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -116,26 +128,44 @@
     <ClCompile Include="Machine.cpp">
       <Filter>Main\Machine</Filter>
     </ClCompile>
-    <ClCompile Include="Machine.initLua.cpp">
-      <Filter>Main\Machine</Filter>
-    </ClCompile>
     <ClCompile Include="UI.cpp">
       <Filter>Main\UI</Filter>
     </ClCompile>
     <ClCompile Include="updateFactory.cpp">
       <Filter>Main\Game</Filter>
     </ClCompile>
-    <ClCompile Include="drawFactory.cpp">
-      <Filter>Main\Game</Filter>
-    </ClCompile>
-    <ClCompile Include="Map.cpp">
-      <Filter>Main\Map</Filter>
-    </ClCompile>
     <ClCompile Include="Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Scuttle.cpp">
-      <Filter>Main\Scuttle</Filter>
+    <ClCompile Include="updateFactoryView.cpp">
+      <Filter>Main\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="updateMapView.cpp">
+      <Filter>Main\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="updateTitle.cpp">
+      <Filter>Main\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Gearbox.cpp">
+      <Filter>Main\Gearbox</Filter>
+    </ClCompile>
+    <ClCompile Include="Blueprint.cpp">
+      <Filter>Main\Blueprint</Filter>
+    </ClCompile>
+    <ClCompile Include="MachineInitLua.cpp">
+      <Filter>Main\Machine</Filter>
+    </ClCompile>
+    <ClCompile Include="Music.cpp">
+      <Filter>Main\Music</Filter>
+    </ClCompile>
+    <ClCompile Include="Planet.cpp">
+      <Filter>Main\Planet</Filter>
+    </ClCompile>
+    <ClCompile Include="Tile.cpp">
+      <Filter>Main\Tile</Filter>
+    </ClCompile>
+    <ClCompile Include="Urban.cpp">
+      <Filter>Main\Urban</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -242,6 +272,9 @@
       <Filter>Resource Files\dll_x86\d3d</Filter>
     </None>
     <None Include="packages.config" />
+    <None Include="..\README.md">
+      <Filter>Main</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -271,11 +304,26 @@
     <ClInclude Include="UI.h">
       <Filter>Main\UI</Filter>
     </ClInclude>
-    <ClInclude Include="Map.h">
-      <Filter>Main\Map</Filter>
+    <ClInclude Include="sol.hpp">
+      <Filter>Main</Filter>
     </ClInclude>
-    <ClInclude Include="Scuttle.h">
-      <Filter>Main\Scuttle</Filter>
+    <ClInclude Include="Gearbox.h">
+      <Filter>Main\Gearbox</Filter>
+    </ClInclude>
+    <ClInclude Include="Blueprint.h">
+      <Filter>Main\Blueprint</Filter>
+    </ClInclude>
+    <ClInclude Include="Music.h">
+      <Filter>Main\Music</Filter>
+    </ClInclude>
+    <ClInclude Include="Planet.h">
+      <Filter>Main\Planet</Filter>
+    </ClInclude>
+    <ClInclude Include="Tile.h">
+      <Filter>Main\Tile</Filter>
+    </ClInclude>
+    <ClInclude Include="Urban.h">
+      <Filter>Main\Urban</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

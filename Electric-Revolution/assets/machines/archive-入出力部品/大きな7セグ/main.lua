@@ -1,3 +1,9 @@
+machine = {
+	name = "7セグメントディスプレイ",
+	size = {x = 4, y = 8},
+	group = "入出力部品"
+}
+
 function init()
     setNode(0.5, 8.0, 0.0, 2.0)
     setNode(1.5, 8.0, 0.0, 2.0)

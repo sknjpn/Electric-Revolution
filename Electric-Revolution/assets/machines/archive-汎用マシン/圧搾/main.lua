@@ -1,10 +1,27 @@
+machine = {
+	name = "圧縮瓶詰機",
+	size = {x = 4, y = 3},
+	group = "汎用マシン"
+}
+
+function init()
+    setGearbox(2, 0, 100)
+
+    setGearbox(0, 1, 10)
+    setGearbox(1, 2, 10)
+    setGearbox(3, 1, 10)
+    
+    connectGearbox(1, 2)
+    connectGearbox(1, 3)
+end
+
 ir = 0
 jr = 1
 progress = 0
 function updateSystem()
 
     --Progress
-    if progress > 0 and getKineticEnergy(2, 0) > 50 then
+    if progress > 0 and getGearboxGain(0) > 40 then
         progress = progress + 1
         if progress == 120 then
             addItem(2, 1, 6)

@@ -1,3 +1,8 @@
+machine = {
+	name = "ガラス溶解がま",
+	size = {x = 6, y = 5},
+	group = "ガラス製造"
+}
 ir = 0
 jr = 1
 il = 0

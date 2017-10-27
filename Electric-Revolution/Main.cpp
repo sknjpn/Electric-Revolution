@@ -2,8 +2,7 @@
 
 #include"Game.h"
 
-
-void Main()
+void	Main()
 {
-	Game game;
+	Game();
 }

@@ -1,3 +1,9 @@
+machine = {
+	name = "アイテムセンサー",
+	size = {x = 1, y = 1},
+	group = "入出力部品"
+}
+
 function init()
     setNode(0.25, 0.75, 0.0, 1.0, 1, true)
     setNode(0.75, 0.75, 0.0, 1.0, 2, true)
