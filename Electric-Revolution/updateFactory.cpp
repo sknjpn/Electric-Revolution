@@ -1,6 +1,5 @@
 #include"Game.h"
 
-
 void	Game::updateFactory(Factory* _f)
 {
 	//M†‰Šú‰»ˆ—

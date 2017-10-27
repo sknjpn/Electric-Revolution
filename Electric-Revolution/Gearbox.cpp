@@ -14,6 +14,7 @@ Point	Gearbox::pos() const
 {
 	return machine->pos + machine->transformInMachinePos(inMachinePos);
 }
+
 Vec2	Gearbox::centerPos() const
 {
 	return Vec2(pos()).movedBy(0.5, 0.5);

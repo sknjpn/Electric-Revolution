@@ -13,6 +13,7 @@ Factory::Factory(Urban* _urban, const JSONValue& _j)
 	, selectedWireColor(Palette::Red)
 	, rightClickedPos(0, 0)
 {
+	//É^ÉCÉãÇÃì«Ç›çûÇ›
 	{
 		Image tileData(L"assets/map/" + _j[L"tileData"].get<String>());
 		JSONReader json(L"assets/map/tileData.json");
@@ -46,6 +47,7 @@ Factory::Factory(Urban* _urban, const JSONValue& _j)
 	//ItemÇÃÉÅÉÇÉäämï€
 	items.reserve(1024);
 }
+
 Node*	Factory::mouseOverNode()
 {
 	for (auto& m : machines)
@@ -57,6 +59,7 @@ Node*	Factory::mouseOverNode()
 	}
 	return nullptr;
 }
+
 void	Factory::addItem(const Point& _pos, int _id, int _layer)
 {
 	for (auto& i : items)
@@ -69,6 +72,7 @@ void	Factory::addItem(const Point& _pos, int _id, int _layer)
 	}
 	items.emplace_back(this, _id, _pos, _layer);
 }
+
 Machine*	Factory::newMachine()
 {
 	for (auto& m : machines)
@@ -77,11 +81,13 @@ Machine*	Factory::newMachine()
 	}
 	return &machines.emplace_back(this);
 }
+
 Tile*	Factory::getTile(const Point& _pos)
 {
 	if (_pos.x < 0 || _pos.y < 0 || _pos.x >= size.x || _pos.y >= size.y) return nullptr;
 	return &tiles[_pos.y][_pos.x];
 }
+
 bool	Factory::canPutItemAt(const Point& _pos, int _id, int _layer)
 {
 	auto* tile = getTile(_pos);

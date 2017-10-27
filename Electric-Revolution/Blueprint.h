@@ -15,6 +15,7 @@ struct Blueprint
 	Texture baseTexture();
 };
 
+//Blueprint‚Ì•ª—Þ
 struct Group
 {
 	String	name;

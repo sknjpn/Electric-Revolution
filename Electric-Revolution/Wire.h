@@ -9,7 +9,6 @@ struct Wire
 	Node*	n1;
 	Color	color;
 
-
 	Wire(Node* _n0, Node* _n1, const Color& _color);
 
 	Bezier3	getBezier3() const;

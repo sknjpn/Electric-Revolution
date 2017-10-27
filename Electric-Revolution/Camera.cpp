@@ -7,6 +7,7 @@ Camera::Camera(RectF restrictedRegion, RectF drawingRegion, double mMax, double 
 	, magnificationMax(mMax)
 	, magnificationMin(mMin)
 {}
+
 Camera::Camera(RectF _restrictedRegion, double mMax, double mMin)
 	: restrictedRegion(_restrictedRegion)
 	, targetDrawingRegion(_restrictedRegion)

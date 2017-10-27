@@ -13,6 +13,7 @@ Item::Item(Factory* _factory, int _id, const Point& _p, int _layer)
 	texture = factory->texture(L"assets/items/" + Format(_id) + L".png");
 	factory->tiles[p.y][p.x].items[layer] = this;
 }
+
 void	Item::set(const Point& _p, int _id, int _layer)
 {
 	id = _id;
@@ -25,11 +26,13 @@ void	Item::set(const Point& _p, int _id, int _layer)
 
 	factory->tiles[p.y][p.x].items[layer] = this;
 }
+
 Vec2	Item::pos() const
 {
 	Vec2 toPos = (angle == 0) ? p.movedBy(1, 0) : (angle == 1) ? p.movedBy(0, 1) : (angle == 2) ? p.movedBy(-1, 0) : p.movedBy(0, -1);
 	return Vec2(p).lerp(toPos, t);
 }
+
 void	Item::remove()
 {
 	enabled = false;
@@ -40,6 +43,7 @@ void	Item::remove()
 		factory->getTile(toPos)->items[layer] = nullptr;
 	}
 }
+
 void	Item::move(Point _p, int _angle, double _t)
 {
 	auto fromPos = (angle == 0) ? p.movedBy(1, 0) : (angle == 1) ? p.movedBy(0, 1) : (angle == 2) ? p.movedBy(-1, 0) : p.movedBy(0, -1);

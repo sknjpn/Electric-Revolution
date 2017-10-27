@@ -4,7 +4,6 @@
 
 Forklift::Forklift(Factory* _factory)
 	: enabled(false)
-	, type(0)
 	, angle(0)
 	, region(0, 0, 0, 0)
 	, selectedMachine(nullptr)
@@ -97,10 +96,10 @@ void	Forklift::update()
 	else region.draw(Color(Palette::Red, 128)).drawFrame(1 / 16.0, Palette::Red);
 
 }
+
 void	Forklift::set(Machine* _sm)
 {
 	blueprint = _sm->blueprint;
-	type = blueprint->type;
 	angle = _sm->angle;
 	enabled = true;
 	baseSize = _sm->baseSize;
@@ -108,10 +107,10 @@ void	Forklift::set(Machine* _sm)
 	baseTexture = _sm->baseTexture;
 	selectedMachine = _sm;
 }
+
 void	Forklift::set(Blueprint* _blueprint)
 {
 	blueprint = _blueprint;
-	type = blueprint->type;
 	angle = 0;
 	enabled = true;
 	baseSize = blueprint->baseSize();
@@ -119,6 +118,7 @@ void	Forklift::set(Blueprint* _blueprint)
 	baseTexture = blueprint->baseTexture();
 	selectedMachine = nullptr;
 }
+
 bool	Forklift::canPutMachine() const
 {
 	for (auto p : step(region.pos, region.size))
@@ -138,6 +138,4 @@ UI::UI(Factory* _factory)
 	, uiTexture(L"assets/uiTexture.png")
 	, factory(_factory)
 	, selectedGroup(nullptr)
-{
-
-}
+{}

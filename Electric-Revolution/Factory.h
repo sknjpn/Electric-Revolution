@@ -34,6 +34,6 @@ struct Factory
 	Node*	mouseOverNode();
 	void	addItem(const Point& _pos, int _id, int _layer);
 	Tile*	getTile(const Point& _pos);
-	Machine*	newMachine();
 	bool	canPutItemAt(const Point& _pos, int _id, int _layer);
+	Machine*	newMachine();
 };

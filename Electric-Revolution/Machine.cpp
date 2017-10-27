@@ -5,9 +5,8 @@
 Machine::Machine(Factory* _factory)
 	: enabled(false)
 	, factory(_factory)
-{
+{}
 
-}
 void	Machine::set(Blueprint* _blueprint, const Point& _pos, int _angle)
 {
 	enabled = true;
@@ -29,6 +28,7 @@ Rect	Machine::region() const
 	if (angle % 2 == 0) return { pos, baseSize };
 	else return { pos, baseSize.y, baseSize.x };
 }
+
 Audio	Machine::audio(const FilePath& _path)
 {
 	for (auto& aa : audioAssets)
@@ -38,10 +38,12 @@ Audio	Machine::audio(const FilePath& _path)
 
 	return audioAssets.emplace_back(_path, _path).second;
 }
+
 Texture	Machine::texture(const FilePath& _path)
 {
 	return factory->texture(_path);
 }
+
 Point	Machine::transformInMachinePos(const Point& _pos) const
 {
 	if (angle == 0) return Point(_pos.x, _pos.y);
@@ -49,6 +51,7 @@ Point	Machine::transformInMachinePos(const Point& _pos) const
 	if (angle == 2) return Point(baseSize.x - 1 - _pos.x, baseSize.y - 1 - _pos.y);
 	return Point(_pos.y, baseSize.x - 1 - _pos.x);
 }
+
 Vec2	Machine::transformInMachinePos(const Vec2& _pos) const
 {
 	if (angle == 0) return Vec2(_pos.x, _pos.y);

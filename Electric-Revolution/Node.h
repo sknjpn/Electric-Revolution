@@ -13,12 +13,11 @@ enum struct NodeState
 //信号接続点
 struct Node
 {
-	bool	fixed;
-	Vec2	inMachinePos;		//相対座標上
-	Vec2	deltaVector;
+	bool	fixed;			//true:出力 false:入力
+	Vec2	inMachinePos;	//相対座標上
+	Vec2	deltaVector;	//ベジェ曲線用
 	Machine*	machine;
 	NodeState	state;
-
 
 	Node(const Vec2& _pos, const Vec2& _dv, Machine* _machine, NodeState _state, bool _fixed);
 

@@ -79,6 +79,7 @@ Game::Game()
 		}
 	}
 }
+
 Font&	Game::font(int _size)
 {
 	while (_size > int(fontAssets.size()))
@@ -88,6 +89,7 @@ Font&	Game::font(int _size)
 
 	return fontAssets[_size - 1];
 }
+
 Texture	Game::texture(const FilePath& _path)
 {
 	for (auto& ta : textureAssets)
@@ -97,6 +99,7 @@ Texture	Game::texture(const FilePath& _path)
 
 	return textureAssets.emplace_back(_path, _path).second;
 }
+
 Texture	Factory::texture(const FilePath& _path)
 {
 	return urban->planet->game->texture(_path);

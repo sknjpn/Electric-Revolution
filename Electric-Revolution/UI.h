@@ -16,13 +16,12 @@ enum struct UIMode
 
 struct Forklift
 {
-	int	type;
 	int angle;
 	bool	enabled;
 	Size	baseSize;
 	Rect	region;
 	Texture	baseTexture;
-	Machine*	selectedMachine;
+	Machine*	selectedMachine;	//nullptr‚È‚çV‹KMachineì¬
 	Factory*	factory;
 	Blueprint*	blueprint;
 
