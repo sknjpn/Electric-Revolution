@@ -20,10 +20,13 @@ void	Forklift::update()
 		angle = (angle + 1) % 4;
 		region.set(region.pos, region.h, region.w);
 	}
-
 	if (MouseL.up())
 	{
-		if (canPutMachine())
+		if (trashboxRegion().intersects(Graphics2D::GetTransformLocal().transform(Cursor::PosF())))
+		{
+			if (selectedMachine != nullptr) selectedMachine->remove();
+		}
+		else if (canPutMachine())
 		{
 			Machine* nm = selectedMachine;
 			if (selectedMachine != nullptr)

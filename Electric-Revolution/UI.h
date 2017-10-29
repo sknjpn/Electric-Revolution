@@ -27,6 +27,10 @@ struct Forklift
 
 	Forklift(Factory* _factory);
 
+	static Rect	trashboxRegion()
+	{
+		return Rect(Window::Size().x - 128, 32, 96, 96);
+	}
 	void	update();
 	void	set(Machine* _sm);
 	void	set(Blueprint* _blueprint);

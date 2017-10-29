@@ -22,6 +22,38 @@ void	Machine::set(Blueprint* _blueprint, const Point& _pos, int _angle)
 	//Tile‚É“o˜^
 	for (auto p : step(pos, region().size)) factory->tiles[p.y][p.x].machine = this;
 }
+void	Machine::remove()
+{
+	//Tile‚©‚çíœ
+	for (auto p : step(pos, region().size))
+	{
+		factory->tiles[p.y][p.x].machine = nullptr;
+		factory->tiles[p.y][p.x].gearbox = nullptr;
+	}
+
+	//Gearbox‚ÌŠO•”‚Æ‚ÌÚ‘±‚ð‰ðœ
+	for (auto& m : factory->machines)
+	{
+		if (&m != this)
+		{
+			for (auto& g : m.gearboxes)
+			{
+				g.connectedGearbox.remove_if([this](const Gearbox* g) {
+					return g->machine == this;
+				});
+			}
+		}
+	}
+	for (auto& g : gearboxes)
+	{
+		g.connectedGearbox.remove_if([this](const Gearbox* g) {
+			return g->machine != this;
+		});
+	}
+	enabled = false;
+	nodes.clear();
+	gearboxes.clear();
+}
 
 Rect	Machine::region() const
 {

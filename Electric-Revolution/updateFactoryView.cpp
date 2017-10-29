@@ -201,6 +201,15 @@ void	Game::updateFactoryView()
 		*/
 	}
 
+	//ƒSƒ~” ‚Ì•`‰æ
+	if (f->forklift.enabled)
+	{
+		auto r = Forklift::trashboxRegion();
+		if (r.mouseOver()) texture(L"assets/trashbox.png")(64, 0, 64, 64).resize(r.size).draw(r.pos);
+		else texture(L"assets/trashbox.png")(0, 0, 64, 64).resize(r.size).draw(r.pos);
+	}
+
+
 	//UI‚Ì•\Ž¦
 	{
 		//trashAreaMouseOver = false;
