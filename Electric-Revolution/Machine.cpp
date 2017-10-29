@@ -48,8 +48,13 @@ void	Machine::moveTo(const Point& _pos, int _angle)
 	//Tile‚©‚çíœ
 	for (auto p : step(pos, region().size))
 	{
-		factory->tiles[p.y][p.x].machine = nullptr;
-		factory->tiles[p.y][p.x].gearbox = nullptr;
+		auto& t = factory->tiles[p.y][p.x];
+		t.machine = nullptr;
+		t.gearbox = nullptr;
+		for (auto* i : t.items)
+		{
+			if (i != nullptr) i->remove();
+		}
 	}
 
 	//Gearbox‚ÌŠO•”‚Æ‚ÌÚ‘±‚ð‰ðœ
@@ -104,8 +109,13 @@ void	Machine::remove()
 	//Tile‚©‚çíœ
 	for (auto p : step(pos, region().size))
 	{
-		factory->tiles[p.y][p.x].machine = nullptr;
-		factory->tiles[p.y][p.x].gearbox = nullptr;
+		auto& t = factory->tiles[p.y][p.x];
+		t.machine = nullptr;
+		t.gearbox = nullptr;
+		for (auto* i : t.items)
+		{
+			if (i != nullptr) i->remove();
+		}
 	}
 
 	//Gearbox‚ÌŠO•”‚Æ‚ÌÚ‘±‚ð‰ðœ
@@ -127,6 +137,7 @@ void	Machine::remove()
 			return g->machine != this;
 		});
 	}
+
 	enabled = false;
 	nodes.clear();
 	gearboxes.clear();
