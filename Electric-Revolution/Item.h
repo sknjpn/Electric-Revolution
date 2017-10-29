@@ -13,7 +13,7 @@ struct Item
 	Point	p;
 	double	t;
 	Texture	texture;
-	Factory* factory;
+	Factory*	factory;
 
 	Item(Factory* _factory, int _id, const Point& _p, int _layer);
 

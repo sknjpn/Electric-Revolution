@@ -7,10 +7,10 @@ struct Machine;
 struct Gearbox
 {
 	Tile*	tile;
+	Point	inMachinePos;		//相対座標上
+	double	gain;
 	double	resistance;
 	double	pressure;
-	double	gain;
-	Point	inMachinePos;		//相対座標上
 	Machine*	machine;
 	Array<Gearbox*>	connectedGearbox;	//接続中のギアボックス
 
