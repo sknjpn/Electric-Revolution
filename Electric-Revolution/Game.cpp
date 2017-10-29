@@ -55,6 +55,7 @@ Game::Game()
 	//System::SetExitEvent(WindowEvent::CloseButton);
 	while (!MouseL.down() && System::Update());
 	music.setMusic(L"assets/music/星くずの行進.mp3");
+	music.setVolume(0.25);
 
 	//メインループ
 	while (System::Update())
