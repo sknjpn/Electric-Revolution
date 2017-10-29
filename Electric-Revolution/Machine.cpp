@@ -19,8 +19,85 @@ void	Machine::set(Blueprint* _blueprint, const Point& _pos, int _angle)
 	mainPath = blueprint->mainPath;
 	initLua();
 
-	//Tile‚É“o˜^
+	//Tile‚Éƒ|ƒCƒ“ƒ^‚ð“o˜^
 	for (auto p : step(pos, region().size)) factory->tiles[p.y][p.x].machine = this;
+
+	//Tile‚ÉGearbox‚Ì“o˜^
+	for (auto& g : gearboxes)
+	{
+		factory->tiles.at(g.pos()).gearbox = &g;
+		for (auto p : step(Point(-1, -1) + g.pos(), Size(3, 3)))
+		{
+
+			if ((p - g.pos()).length() == 1 &&
+				p.x >= 0 && p.y >= 0 &&
+				p.x < factory->size.x && p.y < factory->size.y &&
+				factory->tiles.at(p).gearbox != nullptr)
+			{
+				auto* cg = factory->tiles.at(p).gearbox;
+
+				cg->connectedGearbox.emplace_back(&g);
+				g.connectedGearbox.emplace_back(cg);
+			}
+		}
+	}
+}
+
+void	Machine::moveTo(const Point& _pos, int _angle)
+{
+	//Tile‚©‚çíœ
+	for (auto p : step(pos, region().size))
+	{
+		factory->tiles[p.y][p.x].machine = nullptr;
+		factory->tiles[p.y][p.x].gearbox = nullptr;
+	}
+
+	//Gearbox‚ÌŠO•”‚Æ‚ÌÚ‘±‚ð‰ðœ
+	for (auto& m : factory->machines)
+	{
+		if (&m != this)
+		{
+			for (auto& g : m.gearboxes)
+			{
+				g.connectedGearbox.remove_if([this](const Gearbox* g) {
+					return g->machine == this;
+				});
+			}
+		}
+	}
+	for (auto& g : gearboxes)
+	{
+		g.connectedGearbox.remove_if([this](const Gearbox* g) {
+			return g->machine != this;
+		});
+	}
+
+	//ˆÚ“®
+	angle = _angle;
+	pos = _pos;
+
+	//Tile‚Éƒ|ƒCƒ“ƒ^‚ð“o˜^
+	for (auto p : step(pos, region().size)) factory->tiles[p.y][p.x].machine = this;
+
+	//Tile‚ÉGearbox‚Ì“o˜^
+	for (auto& g : gearboxes)
+	{
+		factory->tiles.at(g.pos()).gearbox = &g;
+		for (auto p : step(Point(-1, -1) + g.pos(), Size(3, 3)))
+		{
+
+			if ((p - g.pos()).length() == 1 &&
+				p.x >= 0 && p.y >= 0 &&
+				p.x < factory->size.x && p.y < factory->size.y &&
+				factory->tiles.at(p).gearbox != nullptr)
+			{
+				auto* cg = factory->tiles.at(p).gearbox;
+
+				cg->connectedGearbox.emplace_back(&g);
+				g.connectedGearbox.emplace_back(cg);
+			}
+		}
+	}
 }
 void	Machine::remove()
 {

@@ -29,6 +29,7 @@ struct Machine
 	void	set(Blueprint* _blueprint, const Point& _pos, int _angle);
 	void	initLua();
 	void	remove();
+	void	moveTo(const Point& _pos, int _angle);
 	Rect	region() const;	//é¿ç¿ïWè„
 	Audio	audio(const FilePath& _path);
 	Texture	texture(const FilePath& _path);

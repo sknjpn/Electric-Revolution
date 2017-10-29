@@ -28,65 +28,8 @@ void	Forklift::update()
 		}
 		else if (canPutMachine())
 		{
-			Machine* nm = selectedMachine;
-			if (selectedMachine != nullptr)
-			{
-				auto* sm = selectedMachine;
-
-				//Tile‚©‚çíœ
-				for (auto p : step(sm->pos, sm->region().size))
-				{
-					factory->tiles[p.y][p.x].machine = nullptr;
-					factory->tiles[p.y][p.x].gearbox = nullptr;
-				}
-
-				//Gearbox‚ÌŠO•”‚Æ‚ÌÚ‘±‚ð‰ðœ
-				for (auto& m : factory->machines)
-				{
-					if (&m != sm)
-					{
-						for (auto& g : m.gearboxes)
-						{
-							g.connectedGearbox.remove_if([sm](const Gearbox* g) {
-								return g->machine == sm;
-							});
-						}
-					}
-				}
-				for (auto& g : sm->gearboxes)
-				{
-					g.connectedGearbox.remove_if([sm](const Gearbox* g) {
-						return g->machine != sm;
-					});
-				}
-
-				sm->angle = angle;
-				sm->pos = region.pos;
-				for (auto p : step(sm->pos, sm->region().size)) factory->tiles[p.y][p.x].machine = sm;
-			}
-			else
-			{
-				nm = factory->newMachine();
-				nm->set(blueprint, region.pos, angle);
-			}
-			for (auto& g : nm->gearboxes)
-			{
-				factory->tiles.at(g.pos()).gearbox = &g;
-				for (auto p : step(Point(-1, -1) + g.pos(), Size(3, 3)))
-				{
-
-					if ((p - g.pos()).length() == 1 &&
-						p.x >= 0 && p.y >= 0 &&
-						p.x < factory->size.x && p.y < factory->size.y &&
-						factory->tiles.at(p).gearbox != nullptr)
-					{
-						auto* cg = factory->tiles.at(p).gearbox;
-
-						cg->connectedGearbox.emplace_back(&g);
-						g.connectedGearbox.emplace_back(cg);
-					}
-				}
-			}
+			if (selectedMachine != nullptr) selectedMachine->moveTo(region.pos, angle);
+			else factory->newMachine()->set(blueprint, region.pos, angle);
 		}
 		enabled = false;
 		return;
