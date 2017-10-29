@@ -102,6 +102,9 @@
     <Filter Include="Main\Urban">
       <UniqueIdentifier>{d75d5ec4-05bf-444f-a9e3-ac2094ca7e57}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Main\Pipe">
+      <UniqueIdentifier>{1bf85c7d-8a81-44e4-aa99-a2676c78f07e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -166,6 +169,9 @@
     </ClCompile>
     <ClCompile Include="Urban.cpp">
       <Filter>Main\Urban</Filter>
+    </ClCompile>
+    <ClCompile Include="Pipe.cpp">
+      <Filter>Main\Pipe</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -324,6 +330,9 @@
     </ClInclude>
     <ClInclude Include="Urban.h">
       <Filter>Main\Urban</Filter>
+    </ClInclude>
+    <ClInclude Include="Pipe.h">
+      <Filter>Main\Pipe</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

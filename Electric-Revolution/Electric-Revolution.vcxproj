@@ -186,6 +186,7 @@
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Music.cpp" />
     <ClCompile Include="Node.cpp" />
+    <ClCompile Include="Pipe.cpp" />
     <ClCompile Include="Planet.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -254,6 +255,7 @@
     <ClInclude Include="Machine.h" />
     <ClInclude Include="Music.h" />
     <ClInclude Include="Node.h" />
+    <ClInclude Include="Pipe.h" />
     <ClInclude Include="Planet.h" />
     <ClInclude Include="sol.hpp" />
     <ClInclude Include="stdafx.h" />
