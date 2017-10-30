@@ -118,6 +118,7 @@ void	Machine::initLua()
 
 		auto a = audio(mainPath + CharacterSet::Widen(str));
 		a.stop();
+		a.setVolume(0.0);
 		a.play();
 	};
 	lua["addItem"] = [this](int x, int y, int id, int layer)
