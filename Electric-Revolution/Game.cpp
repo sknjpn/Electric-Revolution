@@ -53,7 +53,7 @@ Game::Game()
 	Window::Resize(1280, 720);
 	Window::SetTitle(L"Electric Revolution");
 	//System::SetExitEvent(WindowEvent::CloseButton);
-	while (!MouseL.down() && System::Update());
+	//while (!MouseL.down() && System::Update());
 	music.setMusic(L"assets/music/êØÇ≠Ç∏ÇÃçsêi.mp3");
 	music.setVolume(0.25);
 

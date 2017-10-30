@@ -6,4 +6,5 @@ Tile::Tile()
 	, machine(nullptr)
 	, gearbox(nullptr)
 	, isTradeTile(false)
+	, pipe(nullptr)
 {}

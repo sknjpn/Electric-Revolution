@@ -11,6 +11,7 @@ enum struct UIMode
 	EditMachineMode,
 	EditWireMode,
 	EditGearbox,
+	EditPipeMode,
 	Exit,
 };
 

@@ -1,10 +1,11 @@
 #pragma once
 
+#include"Machine.h"
 #include"Camera.h"
 #include"Tile.h"
 #include"Wire.h"
 #include"Item.h"
-#include"Machine.h"
+#include"Pipe.h"
 #include"UI.h"
 
 struct Urban;
@@ -26,7 +27,9 @@ struct Factory
 	Grid<Tile>	tiles;
 	Array<Item>	items;
 	Array<Wire>	wires;
+	Array<Pipe>	pipes;
 	Array<Machine>	machines;
+	Array<Plumber>	plumbers;
 
 	Factory(Urban* _urban, const JSONValue& _j);
 
@@ -35,5 +38,7 @@ struct Factory
 	void	addItem(const Point& _pos, int _id, int _layer);
 	Tile*	getTile(const Point& _pos);
 	bool	canPutItemAt(const Point& _pos, int _id, int _layer);
+	Pipe*	newPipe();
 	Machine*	newMachine();
+	Plumber*	newPlumber();
 };

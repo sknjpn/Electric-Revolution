@@ -3,7 +3,7 @@
 #include"Factory.h"
 
 Machine::Machine(Factory* _factory)
-	: enabled(false)
+	: enabled(true)
 	, factory(_factory)
 {}
 
@@ -53,7 +53,11 @@ void	Machine::moveTo(const Point& _pos, int _angle)
 		t.gearbox = nullptr;
 		for (auto* i : t.items)
 		{
-			if (i != nullptr) i->remove();
+			if (i != nullptr)
+			{
+				i->remove();
+				i = nullptr;
+			}
 		}
 	}
 

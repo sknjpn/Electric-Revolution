@@ -39,7 +39,6 @@ void	Game::updateFactoryView()
 
 		//Tilesの描画
 		{
-			//Graphics2D::SetSamplerState(SamplerState::ClampNearest);
 			RectF r = f->camera.getDrawingRegion();
 			for (auto p : step(Point(int(r.x), int(r.y)), Size(int(r.w) + 2, int(r.h) + 2)))
 			{
@@ -98,6 +97,40 @@ void	Game::updateFactoryView()
 		for (auto& i : f->items)
 		{
 			if (i.enabled) i.texture.resize(1.0, 1.0).draw(i.pos());
+		}
+
+		//Pipeの描画
+		if (ui.uiMode == UIMode::EditPipeMode)
+		{
+			Window::ClientRect().draw(Color(0, 128));
+			for (auto& p : f->pipes)
+			{
+				if (p.enabled)
+				{
+					int value = 0;
+					if (f->getTile(p.pos.movedBy(1, 0))->pipe != nullptr) value += 1;
+					if (f->getTile(p.pos.movedBy(0, 1))->pipe != nullptr) value += 2;
+					if (f->getTile(p.pos.movedBy(-1, 0))->pipe != nullptr) value += 4;
+					if (f->getTile(p.pos.movedBy(0, -1))->pipe != nullptr) value += 8;
+					texture(L"assets/pipe.png")(value * 34 + 1, 1, 32, 32).resize(1.0, 1.0).draw(p.pos, Color(Palette::White, 128));
+					Rect(p.pos, Size(1, 1)).draw(Color(HSV(60 * int(p.plumber - &f->plumbers.front())), 128));
+				}
+			}
+		}
+		if (ui.uiMode == UIMode::EditMachineMode)
+		{
+			for (auto& p : f->pipes)
+			{
+				if (p.enabled)
+				{
+					int value = 0;
+					if (f->getTile(p.pos.movedBy(1, 0))->pipe != nullptr) value += 1;
+					if (f->getTile(p.pos.movedBy(0, 1))->pipe != nullptr) value += 2;
+					if (f->getTile(p.pos.movedBy(-1, 0))->pipe != nullptr) value += 4;
+					if (f->getTile(p.pos.movedBy(0, -1))->pipe != nullptr) value += 8;
+					texture(L"assets/pipe.png")(value * 34 + 1, 1, 32, 32).resize(1.0, 1.0).draw(p.pos, Color(Palette::White, 64));
+				}
+			}
 		}
 
 		//フォークリフト
@@ -212,15 +245,13 @@ void	Game::updateFactoryView()
 
 	//UIの表示
 	{
-		//trashAreaMouseOver = false;
-
 		{
 			Rect(480, 48).draw(Color(80)).drawFrame(4, Color(60));
 			font(32)(f->name).draw(2, 2, Color(240));
 		}
 		{
 			Rect(0, 48, 240, 32).draw(Color(80)).drawFrame(4, Color(60));
-			for (int i = 0; i < 4; i++)
+			for (int i = 0; i < 5; i++)
 			{
 				Rect rect(16 + i * 48, 48, 32, 32);
 				if (int(ui.uiMode) - 1 == i || Rect(16 + i * 48, 48, 32, 32).mouseOver())
@@ -267,18 +298,49 @@ void	Game::updateFactoryView()
 					}
 				}
 			}
-
-			/*
-			if (Machine::selectedMachine != nullptr)
-			{
-				if (trashArea.mouseOver()) trashAreaMouseOver = true;
-				trashArea = Rect(Window::Size().x - 128, 32, 96, 96);
-				trashBox(64 * trashArea.mouseOver(), 0, 64, 64).resize(trashArea.size).draw(trashArea.pos);
-			}
-			*/
-
-
 			break;
+		case UIMode::EditPipeMode:
+		{
+			//視点移動を適用
+			auto t = f->camera.createTransformer();
+
+			auto* tile = f->getTile(Cursor::Pos());
+
+			if (MouseL.pressed() && tile != nullptr && tile->pipe == nullptr)
+			{
+				auto* pipe = f->newPipe();
+				pipe->enabled = true;
+				pipe->setPos(Cursor::Pos());
+			}
+			if (MouseR.pressed() && tile != nullptr && tile->pipe != nullptr)
+			{
+				auto nps = tile->pipe->nearPipes();
+				tile->pipe->plumber->removePipe(tile->pipe);
+				tile->pipe->enabled = false;
+				tile->pipe = nullptr;
+
+				for (auto* np : nps)
+				{
+					auto* plumber = f->newPlumber();
+					Array<Pipe*> ps;
+					plumber->addPipe(np);
+					ps.emplace_back(np);
+					for (int i = 0; i < int(ps.size()); i++)
+					{
+						auto* p = ps[i];
+						for (auto* cp : p->nearPipes())
+						{
+							if (cp->plumber != plumber)
+							{
+								plumber->addPipe(cp);
+								ps.emplace_back(cp);
+							}
+						}
+					}
+				}
+			}
+		}
+		break;
 		case UIMode::EditWireMode:
 		{
 			Array<Color> colorList = {

@@ -59,6 +59,31 @@ void	Machine::initLua()
 	{
 		return gearboxes[gearboxID].gain;
 	};
+	lua["addMole"] = [this](int x, int y, double mole)
+	{
+		Point p(pos + transformInMachinePos(Point(x, y)));
+		if (factory->getTile(p) != nullptr && factory->getTile(p)->pipe != nullptr)
+		{
+			factory->getTile(p)->pipe->plumber->mole += mole;
+		}
+	};
+	lua["getPressure"] = [this](int x, int y)
+	{
+		Point p(pos + transformInMachinePos(Point(x, y)));
+		if (factory->getTile(p) != nullptr && factory->getTile(p)->pipe != nullptr)
+		{
+			return factory->getTile(p)->pipe->plumber->pressure();
+		}
+		return 0.0;
+	};
+	lua["pullMole"] = [this](int x, int y, double mole)
+	{
+		Point p(pos + transformInMachinePos(Point(x, y)));
+		if (factory->getTile(p) != nullptr && factory->getTile(p)->pipe != nullptr)
+		{
+			factory->getTile(p)->pipe->plumber->mole -= mole;
+		}
+	};
 	lua["machineLeftClicked"] = [this]()
 	{
 		return region().leftClicked();

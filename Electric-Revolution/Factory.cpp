@@ -46,6 +46,12 @@ Factory::Factory(Urban* _urban, const JSONValue& _j)
 
 	//Item‚Ìƒƒ‚ƒŠŠm•Û
 	items.reserve(1024);
+
+	//Pipe‚Ìƒƒ‚ƒŠŠm•Û
+	pipes.reserve(4096);
+
+	//Plumber‚Ìƒƒ‚ƒŠŠm•Û
+	plumbers.reserve(256);
 }
 
 Node*	Factory::mouseOverNode()
@@ -73,6 +79,14 @@ void	Factory::addItem(const Point& _pos, int _id, int _layer)
 	items.emplace_back(this, _id, _pos, _layer);
 }
 
+Pipe*	Factory::newPipe()
+{
+	for (auto& p : pipes)
+	{
+		if (!p.enabled) return &p;
+	}
+	return &pipes.emplace_back(this);
+}
 Machine*	Factory::newMachine()
 {
 	for (auto& m : machines)
@@ -80,6 +94,15 @@ Machine*	Factory::newMachine()
 		if (!m.enabled) return &m;
 	}
 	return &machines.emplace_back(this);
+}
+
+Plumber*	Factory::newPlumber()
+{
+	for (auto& p : plumbers)
+	{
+		if (!p.enabled) return &p;
+	}
+	return &plumbers.emplace_back(this);
 }
 
 Tile*	Factory::getTile(const Point& _pos)
