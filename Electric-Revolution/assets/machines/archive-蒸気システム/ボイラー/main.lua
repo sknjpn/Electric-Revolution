@@ -12,7 +12,7 @@ function updateSystem()
 
     if fuel > 0 then
         fuel = fuel - 1
-        addMole(0, 3, 1.0)
+        addMole(0, 3, 4.0)
     end
 
     --Import Left
@@ -30,7 +30,8 @@ function updateSystem()
 
     if isItemPos(1, 2) then
         removeItem(1, 2)
-        fuel = 120
+        fuel = 300
+        playAudio("sound.mp3")
     end
 end
 

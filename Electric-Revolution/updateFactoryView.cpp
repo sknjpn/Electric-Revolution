@@ -60,16 +60,10 @@ void	Game::updateFactoryView()
 			{
 				if (m.lua["draw"].get_type() == sol::type::function) m.lua["draw"]();
 
-				if (ui.uiMode == UIMode::EditMachineMode)
+				if (ui.uiMode == UIMode::EditMachineMode && !f->ui.mouseOver)
 				{
-					if (m.region().mouseOver())
-					{
-						m.region().draw(Color(Palette::Green, 128)).drawFrame(1 / 16.0, Palette::Green);
-					}
-					if (m.region().leftClicked())
-					{
-						f->forklift.set(&m);
-					}
+					if (m.region().mouseOver()) m.region().draw(Color(Palette::Green, 128)).drawFrame(1 / 16.0, Palette::Green);
+					if (m.region().leftClicked()) f->forklift.set(&m);
 				}
 
 				//Gearboxの描画
@@ -79,10 +73,7 @@ void	Game::updateFactoryView()
 					{
 						auto color = Color(Palette::Red, 128);
 						RectF(0.5, 0.5).setCenter(g.centerPos()).draw(color);
-						for (auto& cg : g.connectedGearbox)
-						{
-							Line(g.centerPos(), cg->centerPos()).draw(1 / 8.0, color);
-						}
+						for (auto& cg : g.connectedGearbox) Line(g.centerPos(), cg->centerPos()).draw(1 / 8.0, color);
 					}
 					for (auto& g : m.gearboxes)
 					{
@@ -181,7 +172,7 @@ void	Game::updateFactoryView()
 					Bezier3(p0, p1, p2, p3).draw(1 / 12.0, f->selectedWireColor);
 				}
 			}
-			if (MouseL.down()) f->selectedNode = f->mouseOverNode();
+			if (MouseL.down() && !f->ui.mouseOver) f->selectedNode = f->mouseOverNode();
 			if (MouseL.up() && f->selectedNode != nullptr)
 			{
 				if (mon != nullptr && mon != f->selectedNode)
@@ -222,16 +213,6 @@ void	Game::updateFactoryView()
 				});
 			}
 		}
-
-		/*
-		//Itemの表示
-		RectF r = f->camera.getDrawingRegion();
-		for (auto p : step(Point(int(r.x), int(r.y)), Size(int(r.w) + 2, int(r.h) + 2)))
-		{
-			auto* tile = f->getTile(p);
-			if (tile != nullptr && tile->items[0] != nullptr) Rect(p, 1, 1).draw(Color(Palette::Red,128));
-		}
-		*/
 	}
 
 	//ゴミ箱の描画
@@ -242,29 +223,34 @@ void	Game::updateFactoryView()
 		else texture(L"assets/trashbox.png")(0, 0, 64, 64).resize(r.size).draw(r.pos);
 	}
 
-
 	//UIの表示
 	{
+		bool mouseOver = false;
 		{
-			Rect(480, 48).draw(Color(80)).drawFrame(4, Color(60));
+			Rect rect(480, 48);
+			if (rect.mouseOver()) mouseOver = true;
+			rect.draw(Color(80)).drawFrame(4, Color(60));
 			font(32)(f->name).draw(2, 2, Color(240));
 		}
 		{
-			Rect(0, 48, 240, 32).draw(Color(80)).drawFrame(4, Color(60));
+			Rect rect1(0, 48, 240, 32);
+			if (rect1.mouseOver()) mouseOver = true;
+			rect1.draw(Color(80)).drawFrame(4, Color(60));
 			for (int i = 0; i < 5; i++)
 			{
-				Rect rect(16 + i * 48, 48, 32, 32);
+				Rect rect2(16 + i * 48, 48, 32, 32);
+				if (rect2.mouseOver()) mouseOver = true;
 				if (int(ui.uiMode) - 1 == i || Rect(16 + i * 48, 48, 32, 32).mouseOver())
 				{
-					ui.uiTexture(32 * i, 32, 32, 32).draw(rect.pos);
+					ui.uiTexture(32 * i, 32, 32, 32).draw(rect2.pos);
 
-					if (rect.leftClicked())
+					if (rect2.leftClicked())
 					{
 						if (int(ui.uiMode) - 1 == i) ui.uiMode = UIMode::None;
 						else ui.uiMode = UIMode(i + 1);
 					}
 				}
-				else ui.uiTexture(32 * i, 0, 32, 32).draw(rect.pos);
+				else ui.uiTexture(32 * i, 0, 32, 32).draw(rect2.pos);
 			}
 		}
 		switch (ui.uiMode)
@@ -278,6 +264,7 @@ void	Game::updateFactoryView()
 			{
 				auto& gr = groups[i];
 				Rect rect1(0, 96 + i * 32, 240, 24);
+				if (rect1.mouseOver()) mouseOver = true;
 				rect1.draw(rect1.mouseOver() ? Color(160) : &gr == ui.selectedGroup ? Color(120) : Color(80)).drawFrame(2, Color(60));
 				font(16)(gr.name).draw(rect1.pos.movedBy(0, 0));
 				if (rect1.leftClicked()) ui.selectedGroup = &gr;
@@ -286,8 +273,8 @@ void	Game::updateFactoryView()
 					for (int j = 0; j < int(gr.blueprints.size()); j++)
 					{
 						auto* b = gr.blueprints[j];
-
 						Rect rect2(256, 96 + i * 32 + j * 32, 240, 24);
+						if (rect2.mouseOver()) mouseOver = true;
 						rect2.draw(rect2.mouseOver() ? Color(160) : Color(80)).drawFrame(2, Color(60));
 						font(16)(b->name).draw(rect2.pos.movedBy(0, 0));
 						if (rect2.leftClicked())
@@ -301,39 +288,41 @@ void	Game::updateFactoryView()
 			break;
 		case UIMode::EditPipeMode:
 		{
-			//視点移動を適用
-			auto t = f->camera.createTransformer();
-
-			auto* tile = f->getTile(Cursor::Pos());
-
-			if (MouseL.pressed() && tile != nullptr && tile->pipe == nullptr)
+			if (!f->ui.mouseOver)
 			{
-				auto* pipe = f->newPipe();
-				pipe->enabled = true;
-				pipe->setPos(Cursor::Pos());
-			}
-			if (MouseR.pressed() && tile != nullptr && tile->pipe != nullptr)
-			{
-				auto nps = tile->pipe->nearPipes();
-				tile->pipe->plumber->removePipe(tile->pipe);
-				tile->pipe->enabled = false;
-				tile->pipe = nullptr;
+				//視点移動を適用
+				auto t = f->camera.createTransformer();
+				auto* tile = f->getTile(Cursor::Pos());
 
-				for (auto* np : nps)
+				if (MouseL.pressed() && tile != nullptr && tile->pipe == nullptr)
 				{
-					auto* plumber = f->newPlumber();
-					Array<Pipe*> ps;
-					plumber->addPipe(np);
-					ps.emplace_back(np);
-					for (int i = 0; i < int(ps.size()); i++)
+					auto* pipe = f->newPipe();
+					pipe->enabled = true;
+					pipe->setPos(Cursor::Pos());
+				}
+				if (MouseR.pressed() && tile != nullptr && tile->pipe != nullptr)
+				{
+					auto nps = tile->pipe->nearPipes();
+					tile->pipe->plumber->removePipe(tile->pipe);
+					tile->pipe->enabled = false;
+					tile->pipe = nullptr;
+
+					for (auto* np : nps)
 					{
-						auto* p = ps[i];
-						for (auto* cp : p->nearPipes())
+						auto* plumber = f->newPlumber();
+						Array<Pipe*> ps;
+						plumber->addPipe(np);
+						ps.emplace_back(np);
+						for (int i = 0; i < int(ps.size()); i++)
 						{
-							if (cp->plumber != plumber)
+							auto* p = ps[i];
+							for (auto* cp : p->nearPipes())
 							{
-								plumber->addPipe(cp);
-								ps.emplace_back(cp);
+								if (cp->plumber != plumber)
+								{
+									plumber->addPipe(cp);
+									ps.emplace_back(cp);
+								}
 							}
 						}
 					}
@@ -356,6 +345,7 @@ void	Game::updateFactoryView()
 			for (int i = 0; i < int(colorList.size()); i++)
 			{
 				Rect rect(24, 96 + i * 48, 32, 32);
+				if (rect.mouseOver()) mouseOver = true;
 				rect.draw(colorList[i]).drawFrame(4, 0, Color(60));
 				if (f->selectedWireColor == colorList[i]) rect.drawFrame(4, 0, Palette::Yellow);
 				if (rect.leftClicked()) f->selectedWireColor = colorList[i];
@@ -372,5 +362,7 @@ void	Game::updateFactoryView()
 		default:
 			break;
 		}
+
+		f->ui.mouseOver = mouseOver;
 	}
 }

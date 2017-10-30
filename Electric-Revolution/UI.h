@@ -40,6 +40,7 @@ struct Forklift
 
 struct UI
 {
+	bool	mouseOver;
 	Group*	selectedGroup;
 	UIMode	uiMode;
 	Texture	uiTexture;

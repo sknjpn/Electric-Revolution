@@ -84,4 +84,5 @@ UI::UI(Factory* _factory)
 	, uiTexture(L"assets/uiTexture.png")
 	, factory(_factory)
 	, selectedGroup(nullptr)
+	, mouseOver(false)
 {}
