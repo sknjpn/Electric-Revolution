@@ -1,5 +1,5 @@
 # Electric-Revolution
-## [ダウンロード先](https://lpc1768.sakura.ne.jp/Download/Electric-Revolution.zip)
+# [ダウンロード先](https://github.com/sknjpn/Electric-Revolution/wiki/%E3%83%80%E3%82%A6%E3%83%B3%E3%83%AD%E3%83%BC%E3%83%89)
 
 ## ビルド環境(Tested)
 
