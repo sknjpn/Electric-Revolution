@@ -6,13 +6,13 @@ Game::Game()
 {
 	//ブループリントの設定
 	{
-		auto dc = FileSystem::DirectoryContents(L"assets/machines");
+		auto dc = FileSystem::DirectoryContents(U"assets/machines");
 
 		//ブループリント数の計算
 		int numBlueprint = 0;
 		for (auto c : dc)
 		{
-			if (c.includes(L"main.lua")) numBlueprint++;
+			if (c.includes(U"main.lua")) numBlueprint++;
 		}
 
 		//ブループリントのメモリ領域予約
@@ -21,17 +21,17 @@ Game::Game()
 		//ブループリントの読み込み
 		for (auto c : dc)
 		{
-			if (c.includes(L"main.lua"))
+			if (c.includes(U"main.lua"))
 			{
 				sol::state lua;
-				lua.script_file(CharacterSet::Narrow(c));
-				auto name = CharacterSet::FromUTF8(lua["machine"]["name"].get<std::string>());
-				auto group = CharacterSet::FromUTF8(lua["machine"]["group"].get<std::string>());
-				blueprints.emplace_back(int(blueprints.size()), name, c.removed(L"main.lua"));
+				lua.script_file(Unicode::Narrow(c));
+				auto name = Unicode::FromUTF8(lua["machine"]["name"].get<std::string>());
+				auto group = Unicode::FromUTF8(lua["machine"]["group"].get<std::string>());
+				blueprints.emplace_back(int(blueprints.size()), name, c.removed(U"main.lua"));
 				if (!groups.any([&group](const Group& g) { return group == g.name; })) groups.emplace_back(group);
 
 				//デバッグ用
-				Output << group << L", " << name;
+				Logger << group << U", " << name;
 			}
 		}
 
@@ -41,8 +41,8 @@ Game::Game()
 			for (auto& b : blueprints)
 			{
 				sol::state lua;
-				lua.script_file(CharacterSet::Narrow(b.mainPath + L"main.lua"));
-				auto group = CharacterSet::FromUTF8(lua["machine"]["group"].get<std::string>());
+				lua.script_file(Unicode::Narrow(b.mainPath + U"main.lua"));
+				auto group = Unicode::FromUTF8(lua["machine"]["group"].get<std::string>());
 				if (g.name == group) g.blueprints.emplace_back(&b);
 			}
 		}
@@ -51,10 +51,10 @@ Game::Game()
 	//システム設定
 	Graphics::SetBackground(Palette::Skyblue);
 	Window::Resize(1280, 720);
-	Window::SetTitle(L"Electric Revolution");
+	Window::SetTitle(U"Electric Revolution");
 	//System::SetExitEvent(WindowEvent::CloseButton);
 	//while (!MouseL.down() && System::Update());
-	music.setMusic(L"assets/music/星くずの行進.mp3");
+	music.setMusic(U"assets/music/星くずの行進.mp3");
 	music.setVolume(0.25);
 
 	//メインループ

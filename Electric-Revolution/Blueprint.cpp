@@ -13,11 +13,11 @@ Group::Group(const String& _name)
 Size	Blueprint::baseSize()
 {
 	sol::state lua;
-	lua.script_file(CharacterSet::Narrow(mainPath + L"main.lua"));
+	lua.script_file(Unicode::Narrow(mainPath + U"main.lua"));
 	return { lua["machine"]["size"]["x"].get<int>(), lua["machine"]["size"]["y"].get<int>() };
 }
 
 Texture Blueprint::baseTexture()
 {
-	return Texture(mainPath + L"image.png");
+	return Texture(mainPath + U"image.png");
 }

@@ -43,7 +43,7 @@ void	Game::updateFactoryView()
 			for (auto p : step(Point(int(r.x), int(r.y)), Size(int(r.w) + 2, int(r.h) + 2)))
 			{
 				auto* tile = f->getTile(p);
-				if (tile != nullptr) f->tileTexture(tile->type * 64, 0, 64, 64).resize(1.0, 1.0).draw(p);
+				if (tile != nullptr) f->tileTexture(tile->type * 64, 0, 64, 64).resized(1.0, 1.0).draw(p);
 			}
 		}
 
@@ -87,7 +87,7 @@ void	Game::updateFactoryView()
 		//Item‚Ì•`‰æ
 		for (auto& i : f->items)
 		{
-			if (i.enabled) i.texture.resize(1.0, 1.0).draw(i.pos());
+			if (i.enabled) i.texture.resized(1.0, 1.0).draw(i.pos());
 		}
 
 		//Pipe‚Ì•`‰æ
@@ -103,7 +103,7 @@ void	Game::updateFactoryView()
 					if (f->getTile(p.pos.movedBy(0, 1))->pipe != nullptr) value += 2;
 					if (f->getTile(p.pos.movedBy(-1, 0))->pipe != nullptr) value += 4;
 					if (f->getTile(p.pos.movedBy(0, -1))->pipe != nullptr) value += 8;
-					texture(L"assets/pipe.png")(value * 34 + 1, 1, 32, 32).resize(1.0, 1.0).draw(p.pos, Color(Palette::White, 128));
+					texture(U"assets/pipe.png")(value * 34 + 1, 1, 32, 32).resized(1.0, 1.0).draw(p.pos, Color(Palette::White, 128));
 					Rect(p.pos, Size(1, 1)).draw(Color(HSV(60 * int(p.plumber - &f->plumbers.front())), 128));
 				}
 			}
@@ -119,7 +119,7 @@ void	Game::updateFactoryView()
 					if (f->getTile(p.pos.movedBy(0, 1))->pipe != nullptr) value += 2;
 					if (f->getTile(p.pos.movedBy(-1, 0))->pipe != nullptr) value += 4;
 					if (f->getTile(p.pos.movedBy(0, -1))->pipe != nullptr) value += 8;
-					texture(L"assets/pipe.png")(value * 34 + 1, 1, 32, 32).resize(1.0, 1.0).draw(p.pos, Color(Palette::White, 64));
+					texture(U"assets/pipe.png")(value * 34 + 1, 1, 32, 32).resized(1.0, 1.0).draw(p.pos, Color(Palette::White, 64));
 				}
 			}
 		}
@@ -219,8 +219,8 @@ void	Game::updateFactoryView()
 	if (f->forklift.enabled)
 	{
 		auto r = Forklift::trashboxRegion();
-		if (r.mouseOver()) texture(L"assets/trashbox.png")(64, 0, 64, 64).resize(r.size).draw(r.pos);
-		else texture(L"assets/trashbox.png")(0, 0, 64, 64).resize(r.size).draw(r.pos);
+		if (r.mouseOver()) texture(U"assets/trashbox.png")(64, 0, 64, 64).resized(r.size).draw(r.pos);
+		else texture(U"assets/trashbox.png")(0, 0, 64, 64).resized(r.size).draw(r.pos);
 	}
 
 	//UI‚Ì•\Ž¦

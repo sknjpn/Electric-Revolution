@@ -5,21 +5,21 @@
 void	Machine::initLua()
 {
 
-	lua.script_file(CharacterSet::Narrow(blueprint->mainPath + L"main.lua").c_str());
+	lua.script_file(Unicode::Narrow(blueprint->mainPath + U"main.lua").c_str());
 	lua.open_libraries(sol::lib::base, sol::lib::package, sol::lib::math);
 
 	lua["drawTexture"] = [this](const char* str)
 	{
-		texture(mainPath + CharacterSet::Widen(str))
-			.resize(baseSize)
-			.rotate(angle * 90_deg)
+		texture(mainPath + Unicode::Widen(str))
+			.resized(baseSize)
+			.rotated(angle * 90_deg)
 			.drawAt(region().center());
 	};
 	lua["drawTextureAt"] = [this](const char* str, double sizeX, double sizeY, double posX, double posY)
 	{
-		texture(mainPath + CharacterSet::Widen(str))
-			.resize(sizeX, sizeY)
-			.rotate(angle * 90_deg)
+		texture(mainPath + Unicode::Widen(str))
+			.resized(sizeX, sizeY)
+			.rotated(angle * 90_deg)
 			.drawAt(transformInMachinePos(RectF(posX, posY, sizeX, sizeY).center()) + pos);
 	};
 	lua["setNodeFixed"] = [this](int nodeID, bool fixed)
@@ -116,7 +116,7 @@ void	Machine::initLua()
 	{
 		if (!factory->isMain) return;
 
-		auto a = audio(mainPath + CharacterSet::Widen(str));
+		auto a = audio(mainPath + Unicode::Widen(str));
 		a.stop();
 		a.setVolume(0.0);
 		a.play();

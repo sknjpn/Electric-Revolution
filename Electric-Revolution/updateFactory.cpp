@@ -60,7 +60,7 @@ void	Game::updateFactory(Factory* _f)
 					{
 						for (auto* cg : s->connectedGearbox)
 						{
-							if (!gs.include(cg))
+							if (!gs.includes(cg))
 							{
 								totalR += cg->resistance;
 								totalP += cg->pressure;

@@ -10,7 +10,7 @@ Item::Item(Factory* _factory, int _id, const Point& _p, int _layer)
 	, factory(_factory)
 	, layer(_layer)
 {
-	texture = factory->texture(L"assets/items/" + Format(_id) + L".png");
+	texture = factory->texture(U"assets/items/" + Format(_id) + U".png");
 	factory->tiles[p.y][p.x].items[layer] = this;
 }
 
@@ -20,7 +20,7 @@ void	Item::set(const Point& _p, int _id, int _layer)
 	p = _p;
 	angle = 0;
 	t = 0.0;
-	texture = Texture(L"assets/items/" + Format(_id) + L".png");
+	texture = Texture(U"assets/items/" + Format(_id) + U".png");
 	enabled = true;
 	layer = _layer;
 

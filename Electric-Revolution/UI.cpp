@@ -36,7 +36,7 @@ void	Forklift::update()
 	}
 
 	region = RectF(region).setCenter(Cursor::PosF().movedBy(0.5, 0.5));
-	baseTexture.resize(baseSize).rotate(angle * 90_deg).drawAt(region.pos + region.size / 2.0, Color(Palette::White, 128));
+	baseTexture.resized(baseSize).rotated(angle * 90_deg).drawAt(region.pos + region.size / 2.0, Color(Palette::White, 128));
 
 	if (canPutMachine()) region.draw(Color(Palette::Orange, 128)).drawFrame(1 / 16.0, Palette::Orange);
 	else region.draw(Color(Palette::Red, 128)).drawFrame(1 / 16.0, Palette::Red);
@@ -81,7 +81,7 @@ bool	Forklift::canPutMachine() const
 
 UI::UI(Factory* _factory)
 	: uiMode(UIMode::None)
-	, uiTexture(L"assets/uiTexture.png")
+	, uiTexture(U"assets/uiTexture.png")
 	, factory(_factory)
 	, selectedGroup(nullptr)
 	, mouseOver(false)

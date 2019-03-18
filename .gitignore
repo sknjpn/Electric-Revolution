@@ -615,7 +615,9 @@ tags
 
 ### Electric Revolution
 *_log.html
+*.exe
 /Electric-Revolution/Intermediate/Release-x86
 /Electric-Revolution/Release-x86
 /Electric-Revolution/Intermediate/Release-x64
 /Electric-Revolution/Release-x64
+/Intermediate

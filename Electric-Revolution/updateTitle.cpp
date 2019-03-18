@@ -2,11 +2,11 @@
 
 void	Game::updateTitle()
 {
-	font(128)(L"Electric Revolution").drawAt(Window::Center());
+	font(128)(U"Electric Revolution").drawAt(Window::Center());
 
 	if (MouseL.down())
 	{
-		music.setMusic(L"assets/music/アーケード街.mp3");
+		music.setMusic(U"assets/music/アーケード街.mp3");
 		sceneState = SceneState::MapView;
 	}
 }
